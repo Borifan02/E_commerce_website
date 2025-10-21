@@ -24,8 +24,8 @@ directories.forEach(dir => {
 const envPath = 'backend/.env';
 if (!fs.existsSync(envPath)) {
   const envContent = `NODE_ENV=development
-PORT=5000
-MONGODB_URI="mongodb+srv://dabasaborifan_db_user:Avjqz1lwZWukQnYH@cluster0.waerydc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+PORT=5000r0
+MONGODB_URI="";
 JWT_SECRET=JWT_SECRET=mysupersecretkey123456789
 
 JWT_EXPIRE=30d
