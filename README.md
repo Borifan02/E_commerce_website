@@ -295,10 +295,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Your Name**
+**Borifan Dabasa**
 - Portfolio: [your-portfolio.com](https://your-portfolio.com)
 - LinkedIn: [your-linkedin](https://linkedin.com/in/your-profile)
-- GitHub: [@your-username](https://github.com/your-username)
+- GitHub: [@your-username](https://github.com/Borifan02)
 
 ## 🙏 Acknowledgments
 
@@ -309,7 +309,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email your-email@example.com or open an issue in the repository.
+For support, email dabasaborifan@gmail.com or open an issue in the repository.
 
 ---
 
