@@ -1,22 +1,56 @@
 {
-  "name": "ecommerce-mern",
-  "version": "1.0.0",
-  "description": "E-commerce website built with MERN stack",
-  "main": "server.js",
+  "name": "ecommerce-platform",
+  "version": "2.0.0",
+  "description": "Professional E-Commerce Platform - MERN Stack",
+  "main": "backend/server.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd backend && npm run dev",
-    "client": "cd frontend && npm start",
-    "install-server": "cd backend && npm install",
-    "install-client": "cd frontend && npm install",
-    "install-all": "npm run install-server && npm run install-client",
-    "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start"
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "install-all": "npm run install-backend && npm run install-frontend",
+    "dev-backend": "cd backend && npm run dev",
+    "dev-frontend": "cd frontend && npm start",
+    "dev": "concurrently \"npm run dev-backend\" \"npm run dev-frontend\"",
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "build-frontend": "cd frontend && npm run build",
+    "seed": "cd backend && npm run seed",
+    "docker-build": "docker-compose build",
+    "docker-up": "docker-compose up -d",
+    "docker-down": "docker-compose down",
+    "docker-logs": "docker-compose logs -f",
+    "test-backend": "cd backend && npm test",
+    "test-frontend": "cd frontend && npm test",
+    "test": "npm run test-backend && npm run test-frontend"
   },
-  "keywords": ["ecommerce", "mern", "react", "node", "mongodb", "express"],
-  "author": "Your Name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/ecommerce-platform.git"
+  },
+  "keywords": [
+    "ecommerce",
+    "mern",
+    "react",
+    "nodejs",
+    "mongodb",
+    "express",
+    "redux",
+    "stripe",
+    "material-ui",
+    "docker",
+    "jwt",
+    "rest-api"
+  ],
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/your-username/ecommerce-platform/issues"
+  },
+  "homepage": "https://github.com/your-username/ecommerce-platform#readme",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

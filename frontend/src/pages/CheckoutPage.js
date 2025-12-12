@@ -33,16 +33,13 @@ import {
   selectCartItems,
   selectCartTotal,
   selectShippingAddress,
-  selectPaymentMethod,
   saveShippingAddress,
-  savePaymentMethod,
   clearCart,
 } from '../store/slices/cartSlice';
-import { createOrder, payOrder } from '../store/slices/orderSlice';
+import { createOrder, payOrder, createPaymentIntent } from '../store/slices/orderSlice';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key_here');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 const steps = ['Shipping Address', 'Payment Method', 'Review Order'];
 
@@ -99,7 +96,13 @@ const CheckoutForm = ({ order, onSuccess }) => {
           <Typography variant="h6" gutterBottom>
             Payment Information
           </Typography>
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{
+            mb: 2,
+            p: 2,
+            border: '1px solid #e0e0e0',
+            borderRadius: 1,
+            backgroundColor: '#f8f9fa'
+          }}>
             <CardElement
               options={{
                 style: {
@@ -136,7 +139,6 @@ const CheckoutPage = () => {
   const cartItems = useSelector(selectCartItems);
   const cartTotal = useSelector(selectCartTotal);
   const shippingAddress = useSelector(selectShippingAddress);
-  const paymentMethod = useSelector(selectPaymentMethod);
   const { order, loading } = useSelector((state) => state.orders);
 
   const [activeStep, setActiveStep] = useState(0);
@@ -151,10 +153,10 @@ const CheckoutPage = () => {
   });
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (!loading && cartItems.length === 0) {
       navigate('/cart');
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, navigate, loading]);
 
   const handleAddressChange = (e) => {
     setAddressForm({
@@ -168,12 +170,12 @@ const CheckoutPage = () => {
       // Validate address
       const requiredFields = ['name', 'street', 'city', 'state', 'zipCode', 'phone'];
       const missingFields = requiredFields.filter(field => !addressForm[field]);
-      
+
       if (missingFields.length > 0) {
         toast.error('Please fill in all required fields');
         return;
       }
-      
+
       dispatch(saveShippingAddress(addressForm));
     }
     setActiveStep(activeStep + 1);
@@ -195,8 +197,10 @@ const CheckoutPage = () => {
       };
 
       const result = await dispatch(createOrder(orderData));
-      
-      if (result.payload.success) {
+
+      if (result.payload?.success || result.payload?.order) {
+        // Create Payment Intent after order is created
+        await dispatch(createPaymentIntent(result.payload.order?._id || result.payload?._id || result.payload?.order?._id));
         setActiveStep(2);
       }
     } catch (error) {
@@ -359,7 +363,7 @@ const CheckoutPage = () => {
             <Typography variant="h6" gutterBottom>
               Order Summary
             </Typography>
-            
+
             {cartItems.map((item) => (
               <Box key={item.product} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2">
@@ -370,28 +374,28 @@ const CheckoutPage = () => {
                 </Typography>
               </Box>
             ))}
-            
+
             <Divider sx={{ my: 2 }} />
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="body2">Subtotal</Typography>
               <Typography variant="body2">${cartTotal.toFixed(2)}</Typography>
             </Box>
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="body2">Shipping</Typography>
               <Typography variant="body2">
                 {shippingPrice === 0 ? 'FREE' : `$${shippingPrice.toFixed(2)}`}
               </Typography>
             </Box>
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="body2">Tax</Typography>
               <Typography variant="body2">${taxPrice.toFixed(2)}</Typography>
             </Box>
-            
+
             <Divider sx={{ my: 2 }} />
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="h6">Total</Typography>
               <Typography variant="h6" color="primary">

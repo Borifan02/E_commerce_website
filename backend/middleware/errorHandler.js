@@ -1,43 +1,67 @@
+const logger = require('../utils/logger');
+const { AppError } = require('../utils/errors');
+
+/**
+ * Global Error Handler Middleware
+ * Handles all errors in a consistent format
+ */
 const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
+  error.statusCode = err.statusCode || 500;
 
   // Log error
-  console.error(err);
+  logger.error(`Error: ${err.message}`, {
+    stack: err.stack,
+    url: req.originalUrl,
+    method: req.method,
+    ip: req.ip,
+  });
 
-  // Mongoose bad ObjectId
+  // Mongoose bad ObjectId (CastError)
   if (err.name === 'CastError') {
     const message = 'Resource not found';
-    error = { message, statusCode: 404 };
+    error = new AppError(message, 404);
   }
 
-  // Mongoose duplicate key
+  // Mongoose duplicate key error
   if (err.code === 11000) {
-    const message = 'Duplicate field value entered';
-    error = { message, statusCode: 400 };
+    const field = Object.keys(err.keyPattern)[0];
+    const message = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
+    error = new AppError(message, 409);
   }
 
   // Mongoose validation error
   if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message).join(', ');
-    error = { message, statusCode: 400 };
+    const errors = Object.values(err.errors).map(val => ({
+      field: val.path,
+      message: val.message,
+    }));
+    const message = 'Validation error';
+    error = new AppError(message, 400);
+    error.errors = errors;
   }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     const message = 'Invalid token';
-    error = { message, statusCode: 401 };
+    error = new AppError(message, 401);
   }
 
   if (err.name === 'TokenExpiredError') {
     const message = 'Token expired';
-    error = { message, statusCode: 401 };
+    error = new AppError(message, 401);
   }
 
-  res.status(error.statusCode || 500).json({
+  // Send error response
+  const response = {
     success: false,
-    error: error.message || 'Server Error'
-  });
+    message: error.message || 'Server Error',
+    ...(error.errors && { errors: error.errors }),
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+  };
+
+  res.status(error.statusCode || 500).json(response);
 };
 
 module.exports = errorHandler;

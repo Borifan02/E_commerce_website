@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config({ path: './backend/.env' });
+require('dotenv').config();
 
 // User schema (simplified version)
 const userSchema = new mongoose.Schema({

@@ -132,6 +132,29 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
+export const createPaymentIntent = createAsyncThunk(
+  'orders/createPaymentIntent',
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        '/api/payment/create-payment-intent',
+        { orderId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to create payment intent'
+      );
+    }
+  }
+);
+
 const initialState = {
   orders: [],
   order: null,
@@ -250,6 +273,22 @@ const orderSlice = createSlice({
         state.error = null;
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Create Payment Intent
+      .addCase(createPaymentIntent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createPaymentIntent.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.order) {
+          state.order.clientSecret = action.payload.clientSecret;
+        }
+        state.error = null;
+      })
+      .addCase(createPaymentIntent.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

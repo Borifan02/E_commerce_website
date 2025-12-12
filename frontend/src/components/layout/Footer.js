@@ -1,10 +1,9 @@
-import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Container,
   Typography,
   Grid,
-  Link,
   IconButton,
 } from '@mui/material';
 import {
@@ -41,16 +40,16 @@ const Footer = () => {
               fast delivery.
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton color="inherit" size="small">
+              <IconButton color="inherit" size="small" component="a" href="https://facebook.com" target="_blank">
                 <Facebook />
               </IconButton>
-              <IconButton color="inherit" size="small">
+              <IconButton color="inherit" size="small" component="a" href="https://twitter.com" target="_blank">
                 <Twitter />
               </IconButton>
-              <IconButton color="inherit" size="small">
+              <IconButton color="inherit" size="small" component="a" href="https://instagram.com" target="_blank">
                 <Instagram />
               </IconButton>
-              <IconButton color="inherit" size="small">
+              <IconButton color="inherit" size="small" component="a" href="https://linkedin.com" target="_blank">
                 <LinkedIn />
               </IconButton>
             </Box>
@@ -62,18 +61,18 @@ const Footer = () => {
               Quick Links
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Link href="/" color="inherit" underline="hover">
+              <RouterLink to="/" style={{ color: 'white', textDecoration: 'none' }}>
                 Home
-              </Link>
-              <Link href="/products" color="inherit" underline="hover">
+              </RouterLink>
+              <RouterLink to="/products" style={{ color: 'white', textDecoration: 'none' }}>
                 Products
-              </Link>
-              <Link href="/about" color="inherit" underline="hover">
+              </RouterLink>
+              <RouterLink to="/about" style={{ color: 'white', textDecoration: 'none' }}>
                 About Us
-              </Link>
-              <Link href="/contact" color="inherit" underline="hover">
+              </RouterLink>
+              <RouterLink to="/contact" style={{ color: 'white', textDecoration: 'none' }}>
                 Contact
-              </Link>
+              </RouterLink>
             </Box>
           </Grid>
 
@@ -83,18 +82,18 @@ const Footer = () => {
               Customer Service
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Link href="/help" color="inherit" underline="hover">
+              <RouterLink to="/help" style={{ color: 'white', textDecoration: 'none' }}>
                 Help Center
-              </Link>
-              <Link href="/shipping" color="inherit" underline="hover">
+              </RouterLink>
+              <RouterLink to="/shipping" style={{ color: 'white', textDecoration: 'none' }}>
                 Shipping Info
-              </Link>
-              <Link href="/returns" color="inherit" underline="hover">
+              </RouterLink>
+              <RouterLink to="/returns" style={{ color: 'white', textDecoration: 'none' }}>
                 Returns
-              </Link>
-              <Link href="/privacy" color="inherit" underline="hover">
+              </RouterLink>
+              <RouterLink to="/privacy" style={{ color: 'white', textDecoration: 'none' }}>
                 Privacy Policy
-              </Link>
+              </RouterLink>
             </Box>
           </Grid>
 
@@ -107,19 +106,19 @@ const Footer = () => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <LocationOn fontSize="small" />
                 <Typography variant="body2">
-                  123 Commerce St, City, State 12345
+                Addis Ababa, Ethiopia
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Phone fontSize="small" />
                 <Typography variant="body2">
-                  +1 (555) 123-4567
+                  +251965844287
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Email fontSize="small" />
                 <Typography variant="body2">
-                  support@estore.com
+                  dabasaborifan@gmail.com
                 </Typography>
               </Box>
             </Box>

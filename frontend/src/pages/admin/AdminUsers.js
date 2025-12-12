@@ -62,9 +62,9 @@ const AdminUsers = () => {
     if (user && user.role === 'admin') {
       fetchUsers();
     }
-  }, [user, page]);
+  }, [user, fetchUsers]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = React.useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
@@ -82,7 +82,7 @@ const AdminUsers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
 
   const handleEditUser = (user) => {
     setSelectedUser(user);
@@ -161,7 +161,7 @@ const AdminUsers = () => {
         <Button
           variant="contained"
           startIcon={<PersonAdd />}
-          onClick={() => {/* Add new user functionality */}}
+          onClick={() => {/* Add new user functionality */ }}
         >
           Add User
         </Button>
