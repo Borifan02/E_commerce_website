@@ -27,7 +27,6 @@ import SearchSuggestions from '../common/SearchSuggestions';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
 
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -69,7 +68,7 @@ const Navbar = () => {
       const updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
       setRecentSearches(updated);
       localStorage.setItem('recentSearches', JSON.stringify(updated));
-      
+
       navigate(`/products?search=${encodeURIComponent(searchTerm)}`);
       setSearchQuery('');
       setSearchFocused(false);

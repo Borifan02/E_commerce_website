@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Paper,
   List,
@@ -17,10 +17,10 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-const SearchSuggestions = ({ 
-  open, 
-  onClose, 
-  searchQuery, 
+const SearchSuggestions = ({
+  open,
+  onClose,
+  searchQuery,
   suggestions = [],
   recentSearches = [],
   trendingSearches = [],

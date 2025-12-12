@@ -13,9 +13,7 @@ import {
   Chip,
   Rating,
   Tooltip,
-  Zoom,
   Fade,
-  Badge,
 } from '@mui/material';
 import {
   ShoppingCart,
@@ -194,7 +192,7 @@ const InteractiveProductCard = ({ product, index = 0 }) => {
               </Typography>
             </Box>
           )}
-          
+
           <CardMedia
             component="img"
             image={product.images[0]}

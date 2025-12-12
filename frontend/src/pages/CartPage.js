@@ -26,7 +26,6 @@ import {
   Add,
   Remove,
   Delete,
-  ShoppingCart,
   ArrowBack,
   FlashOn,
   Security,
@@ -49,7 +48,6 @@ const CartPage = () => {
   const cartTotal = useSelector(selectCartTotal);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [hoveredItem, setHoveredItem] = useState(null);
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity < 1) {
@@ -200,8 +198,6 @@ const CartPage = () => {
             {cartItems.map((item, index) => (
               <Fade in={true} timeout={300} key={item.product}>
                 <Card
-                  onMouseEnter={() => setHoveredItem(item.product)}
-                  onMouseLeave={() => setHoveredItem(null)}
                   sx={{
                     mb: 2,
                     border: '1px solid',
