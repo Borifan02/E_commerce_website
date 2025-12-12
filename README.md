@@ -298,7 +298,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Borifan Dabasa**
 - Portfolio: [your-portfolio.com](https://your-portfolio.com)
 - LinkedIn: [your-linkedin](https://linkedin.com/in/your-profile)
-- GitHub: [@your-username](https://github.com/Borifan02)
+- GitHub: [Borifan02](https://github.com/Borifan02)
 
 ## 🙏 Acknowledgments
 
