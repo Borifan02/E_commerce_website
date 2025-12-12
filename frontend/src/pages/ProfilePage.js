@@ -11,7 +11,6 @@ import {
   Button,
   Avatar,
   Divider,
-  Alert,
   CircularProgress,
 } from '@mui/material';
 import { Person, Email, Phone, LocationOn } from '@mui/icons-material';

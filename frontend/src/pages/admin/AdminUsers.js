@@ -58,11 +58,6 @@ const AdminUsers = () => {
     dispatch(loadUser());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (user && user.role === 'admin') {
-      fetchUsers();
-    }
-  }, [user, fetchUsers]);
 
   const fetchUsers = React.useCallback(async () => {
     try {
@@ -83,6 +78,12 @@ const AdminUsers = () => {
       setLoading(false);
     }
   }, [page]);
+
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      fetchUsers();
+    }
+  }, [user, fetchUsers]);
 
   const handleEditUser = (user) => {
     setSelectedUser(user);

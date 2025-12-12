@@ -11,7 +11,6 @@ import {
   Chip,
   TextField,
   Alert,
-  CircularProgress,
   Divider,
   Paper,
   Avatar,
@@ -19,8 +18,6 @@ import {
   Tooltip,
   Tabs,
   Tab,
-  Badge,
-  Zoom,
   Fade,
   Breadcrumbs,
   Link,
@@ -155,8 +152,6 @@ const ProductDetailPage = () => {
 
   // Price formatting
   const priceParts = product.price.toString().split('.');
-  const wholePrice = priceParts[0];
-  const fractionPrice = priceParts[1] || '00';
 
   const discountPercentage = product.originalPrice && product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -242,7 +237,7 @@ const ProductDetailPage = () => {
                 </Box>
               ))}
             </Box>
-            
+
             {/* Main Image with Zoom */}
             <Box
               sx={{
@@ -274,7 +269,7 @@ const ProductDetailPage = () => {
                   onMouseLeave={() => setImageZoom(false)}
                 />
               </Fade>
-              
+
               {/* Zoom Indicator */}
               <Tooltip title="Click to view fullscreen">
                 <IconButton
