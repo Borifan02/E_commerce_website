@@ -87,6 +87,28 @@ router.get('/', optionalAuth, async (req, res) => {
   }
 });
 
+// @desc    Get top rated products
+// @route   GET /api/products/top/rated
+// @access  Public
+router.get('/top/rated', async (req, res) => {
+  try {
+    const products = await Product.find({ isActive: true })
+      .sort({ rating: -1, numReviews: -1 })
+      .limit(8);
+
+    res.json({
+      success: true,
+      products
+    });
+  } catch (error) {
+    console.error('Get top products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 // @desc    Get single product
 // @route   GET /api/products/:id
 // @access  Public
@@ -275,26 +297,6 @@ router.post('/:id/reviews', protect, [
   }
 });
 
-// @desc    Get top rated products
-// @route   GET /api/products/top
-// @access  Public
-router.get('/top/rated', async (req, res) => {
-  try {
-    const products = await Product.find({ isActive: true })
-      .sort({ rating: -1 })
-      .limit(5);
 
-    res.json({
-      success: true,
-      products
-    });
-  } catch (error) {
-    console.error('Get top products error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
 
 module.exports = router;
