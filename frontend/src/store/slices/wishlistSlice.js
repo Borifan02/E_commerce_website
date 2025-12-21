@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../utils/api';
 
 const API_URL = '/api/wishlist';
 
@@ -11,7 +11,7 @@ export const fetchWishlist = createAsyncThunk(
       const config = {
         headers: { Authorization: `Bearer ${auth.token}` }
       };
-      const { data } = await axios.get(API_URL, config);
+      const { data } = await api.get(API_URL, config);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch wishlist');
@@ -27,7 +27,7 @@ export const addToWishlist = createAsyncThunk(
       const config = {
         headers: { Authorization: `Bearer ${auth.token}` }
       };
-      const { data } = await axios.post(`${API_URL}/${productId}`, {}, config);
+      const { data } = await api.post(`${API_URL}/${productId}`, {}, config);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add to wishlist');
@@ -43,7 +43,7 @@ export const removeFromWishlist = createAsyncThunk(
       const config = {
         headers: { Authorization: `Bearer ${auth.token}` }
       };
-      const { data } = await axios.delete(`${API_URL}/${productId}`, config);
+      const { data } = await api.delete(`${API_URL}/${productId}`, config);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to remove from wishlist');

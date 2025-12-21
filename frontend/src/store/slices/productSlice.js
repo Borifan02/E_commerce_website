@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../utils/api';
 
 // Async thunks
 export const fetchProducts = createAsyncThunk(
@@ -18,7 +18,7 @@ export const fetchProducts = createAsyncThunk(
       if (search) queryParams.append('search', search);
       if (sort) queryParams.append('sort', sort);
 
-      const response = await axios.get(`/api/products?${queryParams}`);
+      const response = await api.get(`/api/products?${queryParams}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -32,7 +32,7 @@ export const fetchProduct = createAsyncThunk(
   'products/fetchProduct',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/products/${id}`);
+      const response = await api.get(`/api/products/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -47,7 +47,7 @@ export const createProduct = createAsyncThunk(
   async (productData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/api/products', productData, {
+      const response = await api.post('/api/products', productData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -66,7 +66,7 @@ export const updateProduct = createAsyncThunk(
   async ({ id, productData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(`/api/products/${id}`, productData, {
+      const response = await api.put(`/api/products/${id}`, productData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -85,7 +85,7 @@ export const deleteProduct = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/products/${id}`, {
+      await api.delete(`/api/products/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -104,7 +104,7 @@ export const createReview = createAsyncThunk(
   async ({ productId, rating, comment }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
+      const response = await api.post(
         `/api/products/${productId}/reviews`,
         { rating, comment },
         {
@@ -126,7 +126,7 @@ export const fetchTopProducts = createAsyncThunk(
   'products/fetchTopProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/products/top/rated');
+      const response = await api.get('/api/products/top/rated');
       return response.data;
     } catch (error) {
       return rejectWithValue(

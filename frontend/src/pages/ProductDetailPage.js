@@ -48,7 +48,7 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { product, loading } = useSelector((state) => state.products);
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
 
   const [quantity, setQuantity] = useState(1);
@@ -294,8 +294,7 @@ const ProductDetailPage = () => {
                   sx={{
                     position: 'absolute',
                     bottom: 16,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
+                    left: 16,
                     bgcolor: 'rgba(0,0,0,0.7)',
                     color: 'white',
                   }}
@@ -305,497 +304,388 @@ const ProductDetailPage = () => {
           </Box>
         </Grid>
 
-        {/* Image Lightbox */}
-        <ImageLightbox
-          images={product.images}
-          open={lightboxOpen}
-          onClose={() => setLightboxOpen(false)}
-          initialIndex={selectedImage}
-        />
-
-        {/* Center: Interactive Details */}
-        <Grid item xs={12} md={4}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="h4"
-                component="h1"
-                gutterBottom
-                sx={{
-                  fontWeight: 500,
-                  color: '#0F1111',
-                  lineHeight: 1.3,
-                }}
-              >
-                {product.name}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
-              <Tooltip title={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}>
-                <IconButton
-                  onClick={handleWishlistToggle}
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: 'error.light',
-                      color: 'error.main',
-                    },
-                  }}
-                >
-                  {isInWishlist ? <Favorite color="error" /> : <FavoriteBorder />}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Share">
-                <IconButton
-                  onClick={handleShare}
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Share />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-
-          <Typography
-            variant="body2"
-            color="primary"
-            sx={{
-              mb: 2,
-              cursor: 'pointer',
-              fontWeight: 500,
-              '&:hover': {
-                textDecoration: 'underline',
-                color: '#c7511f',
-              },
-            }}
-          >
-            Visit the {product.brand} Store
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <Rating
-              value={product.rating}
-              readOnly
-              precision={0.5}
-              size="medium"
-              sx={{ color: '#ffc107' }}
-            />
-            <Typography
-              variant="body1"
-              sx={{
-                color: '#007185',
-                cursor: 'pointer',
-                fontWeight: 500,
-                '&:hover': {
-                  textDecoration: 'underline',
-                  color: '#c7511f',
-                },
-              }}
-              onClick={() => {
-                document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              {product.numReviews} {product.numReviews === 1 ? 'rating' : 'ratings'}
+        {/* Right: Product Information */}
+        <Grid item xs={12} md={7}>
+          <Box sx={{ pl: { md: 4 } }}>
+            {/* Product Title & Rating */}
+            <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
+              {product.name}
             </Typography>
-            {product.numReviews > 0 && (
-              <Chip
-                label={`${product.rating.toFixed(1)} out of 5`}
-                size="small"
-                color="success"
-                sx={{ fontWeight: 'bold' }}
-              />
-            )}
-          </Box>
 
-          <Divider sx={{ my: 3 }} />
-
-          {/* Price Section */}
-          <Box sx={{ mb: 3 }}>
-            {discountPercentage > 0 && (
-              <Chip
-                label={`Save ${discountPercentage}%`}
-                color="error"
-                sx={{
-                  mb: 1,
-                  fontWeight: 'bold',
-                  fontSize: '0.9rem',
-                  height: 32,
-                }}
-              />
-            )}
-            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mb: 1 }}>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#CC0C39' }}>
-                ${product.price.toFixed(2)}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Rating value={product.rating} precision={0.1} readOnly />
+              <Typography variant="body2" color="text.secondary">
+                ({product.numReviews} reviews)
               </Typography>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      textDecoration: 'line-through',
-                      color: 'text.secondary',
-                    }}
-                  >
-                    ${product.originalPrice.toFixed(2)}
-                  </Typography>
-                  <Chip
-                    label={`Save $${(product.originalPrice - product.price).toFixed(2)}`}
-                    size="small"
-                    color="success"
-                    sx={{ fontWeight: 'bold' }}
-                  />
-                </>
+              {product.verified && (
+                <Chip
+                  icon={<Verified />}
+                  label="Verified"
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                />
               )}
             </Box>
-            {product.originalPrice && (
-              <Typography variant="body2" color="text.secondary">
-                List Price: <span style={{ textDecoration: 'line-through' }}>${product.originalPrice.toFixed(2)}</span>
-              </Typography>
-            )}
-          </Box>
 
-          {/* Description with Tabs */}
-          <Box sx={{ mb: 3 }}>
-            <Tabs
-              value={activeTab}
-              onChange={(e, newValue) => setActiveTab(newValue)}
-              sx={{
-                borderBottom: 1,
-                borderColor: 'divider',
-                mb: 2,
-              }}
-            >
-              <Tab label="Description" />
-              <Tab label="Specifications" />
-              <Tab label={`Reviews (${product.numReviews})`} />
-            </Tabs>
-
-            {activeTab === 0 && (
-              <Typography
-                variant="body1"
-                sx={{
-                  mt: 2,
-                  lineHeight: 1.8,
-                  color: 'text.primary',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {product.description}
-              </Typography>
-            )}
-
-            {activeTab === 1 && product.specifications && (
-              <Box sx={{ mt: 2 }}>
-                <Grid container spacing={2}>
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <React.Fragment key={key}>
-                      <Grid item xs={4}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: 'bold',
-                            color: '#565959',
-                          }}
-                        >
-                          {key}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <Typography variant="body2">{value}</Typography>
-                      </Grid>
-                    </React.Fragment>
-                  ))}
-                </Grid>
-              </Box>
-            )}
-
-            {activeTab === 2 && (
-              <Box id="reviews-section">
-                {product.reviews.length === 0 ? (
-                  <Alert severity="info" sx={{ mt: 2 }}>
-                    No reviews yet. Be the first to review!
-                  </Alert>
-                ) : (
-                  <Box sx={{ mt: 2 }}>
-                    {product.reviews.map((review, index) => (
-                      <Paper
-                        key={index}
-                        elevation={0}
-                        sx={{
-                          p: 2,
-                          mb: 2,
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          borderRadius: 2,
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                          <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>
-                            {review.name.charAt(0).toUpperCase()}
-                          </Avatar>
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                              {review.name}
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Rating value={review.rating} readOnly size="small" />
-                              <Chip
-                                icon={<Verified />}
-                                label="Verified Purchase"
-                                size="small"
-                                color="success"
-                                sx={{ height: 20, fontSize: '0.7rem' }}
-                              />
-                            </Box>
-                          </Box>
-                        </Box>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: 'block', mb: 1 }}
-                        >
-                          Reviewed on {new Date(review.createdAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </Typography>
-                        <Typography variant="body1">{review.comment}</Typography>
-                        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                          <Tooltip title="Helpful">
-                            <IconButton size="small">
-                              <ThumbUp fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Not Helpful">
-                            <IconButton size="small">
-                              <ThumbDown fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </Paper>
-                    ))}
-                  </Box>
-                )}
-              </Box>
-            )}
-          </Box>
-        </Grid>
-
-        {/* Right: Interactive Buy Box */}
-        <Grid item xs={12} md={3}>
-          <Paper
-            elevation={3}
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              position: 'sticky',
-              top: 20,
-              border: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#CC0C39', mb: 1 }}>
-              ${product.price.toFixed(2)}
-            </Typography>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 2 }}
-              >
-                List Price: <span style={{ textDecoration: 'line-through' }}>${product.originalPrice.toFixed(2)}</span>
-              </Typography>
-            )}
-
-            <Box sx={{ mt: 1 }}>
-              <Typography variant="body2" sx={{ color: '#565959' }}>
-                Delivery <span style={{ fontWeight: 'bold', color: '#0F1111' }}>Tuesday, Sep 19</span>
-              </Typography>
-              <Typography variant="caption" sx={{ color: '#007185', display: 'block', mt: 0.5 }}>
-                Deliver to {isAuthenticated ? user?.name : 'Select Location'}
-              </Typography>
-            </Box>
-
-            <Typography variant="h6" sx={{ color: product.stock > 0 ? '#007600' : '#B12704', fontSize: '18px', my: 2 }}>
-              {product.stock > 0 ? 'In Stock' : 'Currently Unavailable'}
-            </Typography>
-
-            {product.stock > 0 ? (
-              <Box>
-                {/* Quantity Selector */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    mb: 3,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    p: 1,
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                    Quantity:
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <IconButton
-                      size="small"
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      disabled={quantity <= 1}
-                      sx={{
-                        border: '1px solid',
-                        borderColor: 'divider',
-                      }}
-                    >
-                      <Remove fontSize="small" />
-                    </IconButton>
+            {/* Price Section */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 1 }}>
+                <Typography variant="h4" color="error.main" sx={{ fontWeight: 700 }}>
+                  ${product.price}
+                </Typography>
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <>
                     <Typography
                       variant="h6"
                       sx={{
-                        minWidth: 40,
-                        textAlign: 'center',
-                        fontWeight: 'bold',
+                        textDecoration: 'line-through',
+                        color: 'text.secondary',
                       }}
                     >
-                      {quantity}
+                      ${product.originalPrice}
                     </Typography>
-                    <IconButton
+                    <Chip
+                      label={`${discountPercentage}% OFF`}
+                      color="error"
                       size="small"
-                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                      disabled={quantity >= product.stock}
-                      sx={{
-                        border: '1px solid',
-                        borderColor: 'divider',
-                      }}
-                    >
-                      <Add fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </Box>
+                      icon={<FlashOn />}
+                    />
+                  </>
+                )}
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                Inclusive of all taxes
+              </Typography>
+            </Box>
 
+            {/* Stock Status */}
+            <Box sx={{ mb: 3 }}>
+              {product.stock > 0 ? (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  In Stock ({product.stock} available)
+                </Alert>
+              ) : (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  Out of Stock
+                </Alert>
+              )}
+            </Box>
+
+            {/* Description */}
+            <Typography variant="body1" paragraph sx={{ mb: 3, lineHeight: 1.7 }}>
+              {product.description}
+            </Typography>
+
+            {/* Quantity & Actions */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                Quantity:
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                  <IconButton
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                    size="small"
+                  >
+                    <Remove />
+                  </IconButton>
+                  <Typography sx={{ px: 2, minWidth: 40, textAlign: 'center' }}>
+                    {quantity}
+                  </Typography>
+                  <IconButton
+                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    disabled={quantity >= product.stock}
+                    size="small"
+                  >
+                    <Add />
+                  </IconButton>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  Max {product.stock} items
+                </Typography>
+              </Box>
+
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                 <Button
-                  fullWidth
                   variant="contained"
-                  color="secondary"
                   size="large"
                   startIcon={<ShoppingCart />}
-                  sx={{
-                    mb: 2,
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontWeight: 'bold',
-                    py: 1.5,
-                    boxShadow: 2,
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: 4,
-                    },
-                    transition: 'all 0.3s',
-                  }}
                   onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  sx={{
+                    flex: 1,
+                    py: 1.5,
+                    bgcolor: '#ff9f00',
+                    '&:hover': {
+                      bgcolor: '#e88900',
+                    },
+                  }}
                 >
                   Add to Cart
                 </Button>
                 <Button
-                  fullWidth
                   variant="contained"
                   size="large"
-                  startIcon={<FlashOn />}
                   onClick={handleBuyNow}
+                  disabled={product.stock === 0}
                   sx={{
-                    bgcolor: '#ffa41c',
-                    '&:hover': {
-                      bgcolor: '#fa8900',
-                      transform: 'translateY(-2px)',
-                    },
-                    color: 'black',
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontWeight: 'bold',
+                    flex: 1,
                     py: 1.5,
-                    boxShadow: 2,
-                    transition: 'all 0.3s',
+                    bgcolor: '#fb641b',
+                    '&:hover': {
+                      bgcolor: '#e55a19',
+                    },
                   }}
                 >
                   Buy Now
                 </Button>
               </Box>
-            ) : (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Currently unavailable
-              </Alert>
-            )}
 
-            <Box sx={{ mt: 2, fontSize: '12px', color: '#565959' }}>
-              <Grid container>
-                <Grid item xs={4}>Ships from</Grid>
-                <Grid item xs={8}>Amazon.com</Grid>
-                <Grid item xs={4}>Sold by</Grid>
-                <Grid item xs={8}>Amazon.com</Grid>
-              </Grid>
+              {/* Secondary Actions */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={isInWishlist ? <Favorite /> : <FavoriteBorder />}
+                  onClick={handleWishlistToggle}
+                  sx={{
+                    flex: 1,
+                    color: isInWishlist ? 'error.main' : 'text.secondary',
+                    borderColor: isInWishlist ? 'error.main' : 'divider',
+                  }}
+                >
+                  {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<Share />}
+                  onClick={handleShare}
+                  sx={{ flex: 1 }}
+                >
+                  Share
+                </Button>
+              </Box>
             </Box>
-          </Paper>
-        </Grid>
 
+            {/* Product Features */}
+            {product.features && product.features.length > 0 && (
+              <Paper sx={{ p: 3, mb: 3, bgcolor: 'grey.50' }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                  Key Features
+                </Typography>
+                <Box component="ul" sx={{ pl: 2, m: 0 }}>
+                  {product.features.map((feature, index) => (
+                    <Typography component="li" key={index} variant="body2" sx={{ mb: 0.5 }}>
+                      {feature}
+                    </Typography>
+                  ))}
+                </Box>
+              </Paper>
+            )}
+          </Box>
+        </Grid>
       </Grid>
 
-      {/* Review Form Section */}
-      {isAuthenticated && activeTab === 2 && (
-        <Paper
-          elevation={2}
-          sx={{
-            p: 3,
-            mt: 4,
-            borderRadius: 3,
-            maxWidth: 800,
-          }}
+      {/* Product Details Tabs */}
+      <Box sx={{ mt: 6 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(e, newValue) => setActiveTab(newValue)}
+          sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Write a Review
-          </Typography>
-          <Box component="form" onSubmit={handleReviewSubmit} sx={{ mt: 2 }}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" gutterBottom>
-                Rating
-              </Typography>
-              <Rating
-                value={reviewForm.rating}
-                onChange={(e, newValue) =>
-                  setReviewForm({ ...reviewForm, rating: newValue })
-                }
-                size="large"
-              />
-            </Box>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Your Review"
-              value={reviewForm.comment}
-              onChange={(e) =>
-                setReviewForm({ ...reviewForm, comment: e.target.value })
-              }
-              placeholder="Share your thoughts about this product..."
-              sx={{ mb: 2 }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!reviewForm.comment.trim() || reviewForm.comment.length < 10}
-              sx={{ borderRadius: 2, textTransform: 'none' }}
-            >
-              Submit Review
-            </Button>
+          <Tab label="Reviews" />
+          <Tab label="Specifications" />
+          <Tab label="Shipping & Returns" />
+        </Tabs>
+
+        {/* Reviews Tab */}
+        {activeTab === 0 && (
+          <Box sx={{ py: 4 }}>
+            <Grid container spacing={4}>
+              {/* Write Review */}
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                  Write a Review
+                </Typography>
+                {isAuthenticated ? (
+                  <Paper sx={{ p: 3 }}>
+                    <form onSubmit={handleReviewSubmit}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography component="legend" gutterBottom>
+                          Rating
+                        </Typography>
+                        <Rating
+                          value={reviewForm.rating}
+                          onChange={(e, newValue) =>
+                            setReviewForm({ ...reviewForm, rating: newValue })
+                          }
+                        />
+                      </Box>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Your Review"
+                        value={reviewForm.comment}
+                        onChange={(e) =>
+                          setReviewForm({ ...reviewForm, comment: e.target.value })
+                        }
+                        sx={{ mb: 2 }}
+                      />
+                      <Button type="submit" variant="contained">
+                        Submit Review
+                      </Button>
+                    </form>
+                  </Paper>
+                ) : (
+                  <Alert severity="info">
+                    Please{' '}
+                    <Link component="button" onClick={() => navigate('/login')}>
+                      login
+                    </Link>{' '}
+                    to write a review.
+                  </Alert>
+                )}
+              </Grid>
+
+              {/* Reviews List */}
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                  Customer Reviews ({product.reviews?.length || 0})
+                </Typography>
+                <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+                  {product.reviews && product.reviews.length > 0 ? (
+                    product.reviews.map((review) => (
+                      <Paper key={review._id} sx={{ p: 2, mb: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                          <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>
+                            {review.user.name.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                              {review.user.name}
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Rating value={review.rating} size="small" readOnly />
+                              <Typography variant="caption" color="text.secondary">
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Box>
+                        <Typography variant="body2" sx={{ mb: 2 }}>
+                          {review.comment}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <IconButton size="small">
+                            <ThumbUp fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small">
+                            <ThumbDown fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </Paper>
+                    ))
+                  ) : (
+                    <Typography color="text.secondary">
+                      No reviews yet. Be the first to review this product!
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
+            </Grid>
           </Box>
-        </Paper>
-      )}
+        )}
+
+        {/* Specifications Tab */}
+        {activeTab === 1 && (
+          <Box sx={{ py: 4 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+              Product Specifications
+            </Typography>
+            <Paper sx={{ p: 3 }}>
+              {product.specifications ? (
+                <Grid container spacing={2}>
+                  {Object.entries(product.specifications).map(([key, value]) => (
+                    <Grid item xs={12} sm={6} key={key}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
+                          {key.replace(/([A-Z])/g, ' $1').trim()}:
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {value}
+                        </Typography>
+                      </Box>
+                      <Divider />
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Typography color="text.secondary">
+                  No specifications available for this product.
+                </Typography>
+              )}
+            </Paper>
+          </Box>
+        )}
+
+        {/* Shipping & Returns Tab */}
+        {activeTab === 2 && (
+          <Box sx={{ py: 4 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+              Shipping & Returns
+            </Typography>
+            <Paper sx={{ p: 3 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                    Shipping Information
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Free shipping on orders over $50
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Standard delivery: 3-5 business days
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Express delivery: 1-2 business days (additional charges apply)
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Same day delivery available in select cities
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                    Return Policy
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • 30-day return policy
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Items must be in original condition
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Free returns for defective items
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    • Return shipping costs may apply for non-defective returns
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Box>
+        )}
+      </Box>
+
+      {/* Image Lightbox */}
+      <ImageLightbox
+        images={product.images}
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        initialIndex={selectedImage}
+      />
     </Container>
   );
 };
