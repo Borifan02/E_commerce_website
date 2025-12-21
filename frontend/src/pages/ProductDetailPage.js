@@ -150,9 +150,7 @@ const ProductDetailPage = () => {
     );
   }
 
-  // Price formatting
-  const priceParts = product.price.toString().split('.');
-
+  // Price formatting - removed unused variable
   const discountPercentage = product.originalPrice && product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;

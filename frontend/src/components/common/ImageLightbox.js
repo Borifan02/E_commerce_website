@@ -154,7 +154,7 @@ const ImageLightbox = ({ images, open, onClose, initialIndex = 0 }) => {
           >
             <img
               src={images[currentIndex]}
-              alt={`Product image ${currentIndex + 1}`}
+              alt={`Product ${currentIndex + 1}`}
               style={{
                 maxWidth: `${100 * zoom}%`,
                 maxHeight: `${100 * zoom}%`,

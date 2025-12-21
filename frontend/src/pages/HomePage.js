@@ -6,9 +6,6 @@ import {
   Button,
   Grid,
   Paper,
-  IconButton,
-  Card,
-  CardContent,
   useTheme,
   useMediaQuery,
 } from '@mui/material';

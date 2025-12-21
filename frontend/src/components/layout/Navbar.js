@@ -19,7 +19,7 @@ import {
   Menu as MenuIcon,
   Clear,
 } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { selectCartItemsCount } from '../../store/slices/cartSlice';
