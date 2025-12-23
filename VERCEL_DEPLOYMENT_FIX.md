@@ -14,14 +14,13 @@ Set these environment variables in your Vercel project dashboard:
 
 **Backend Environment Variables:**
 - `NODE_ENV` = `production`
-- `MONGODB_URI` = `mongodb+srv://dabasaborifan_db_user:Avjqz1lwZWukQnYH@cluster0.waerydc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
-- `JWT_SECRET` = `mysupersecretkey123456789`
+- `MONGODB_URI` = 
+- `JWT_SECRET` = `
 - `JWT_EXPIRE` = `30d`
-- `STRIPE_SECRET_KEY` = `sk_test_51ScnySR58FH8Bu5pgyRDGxs7es1kQJt8io9ZSiINsQpBN745lb5fhleJjfSSZUNrhsdZ0i21IzKJxG03i0gsDdp200SyUdyT3C`
-- `STRIPE_PUBLISHABLE_KEY` = `pk_test_51ScnySR58FH8Bu5pYbHzsgS3vEA1qTS4sK7xEbU8ZJsQ2QGiu10j2jo0KAOHVwCwLDxNgQkRTjL56wMNxKLl5dLg0077uIz37y`
-- `STRIPE_WEBHOOK_SECRET` = `whsec_80091f37d4a4fe291ff952085adce168ac577677b404dafdf53b973130f59817`
-- `EMAIL_USER` = `dabasaborifan@gmail.com`
-- `EMAIL_PASS` = `quhcafhrsoufsbvu`
+- `STRIPE_SECRET_KEY` = `
+- `STRIPE_WEBHOOK_SECRET` = 
+- `EMAIL_USER` = `
+- `EMAIL_PASS` = `
 - `CLIENT_URL` = `https://your-actual-vercel-url.vercel.app`
 
 **Frontend Environment Variables:**
