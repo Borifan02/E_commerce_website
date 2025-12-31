@@ -297,7 +297,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Borifan Dabasa**
 - Portfolio: [portfolio.com](https://professional-portfolio-borifan.vercel.app/)
-- LinkedIn: [linkedin](https://linkedin.com/in/your-profile)
+- LinkedIn: [linkedin](http://www.linkedin.com/in/borifan-dabasa-a5191036b/)
 - GitHub: [Borifan02](https://github.com/Borifan02)
 
 ## 🙏 Acknowledgments
