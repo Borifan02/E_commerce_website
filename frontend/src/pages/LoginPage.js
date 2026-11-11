@@ -9,6 +9,7 @@ import {
   Link,
   Alert,
   CircularProgress,
+  Chip,
 } from '@mui/material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,7 +20,7 @@ const LoginPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   
-  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+  const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -30,9 +31,13 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(from, { replace: true });
+      if (user?.role === 'admin' && from === '/') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, user, navigate, from]);
 
   useEffect(() => {
     return () => {
@@ -79,6 +84,30 @@ const LoginPage = () => {
                 {error}
               </Alert>
             )}
+
+            {/* Quick Demo Credentials Assistant */}
+            <Paper variant="outlined" sx={{ p: 2, mb: 2, width: '100%', bgcolor: '#f8fafc', borderRadius: 2 }}>
+              <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#475569', display: 'block', mb: 1 }}>
+                🔑 Pre-Configured Admin Logins (Click to Autofill):
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Chip
+                  label="Admin (admin@ecommerce.com)"
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  onClick={() => setFormData({ email: 'admin@ecommerce.com', password: 'admin123456' })}
+                  sx={{ cursor: 'pointer', fontWeight: 500 }}
+                />
+                <Chip
+                  label="Demo Admin (admin@example.com)"
+                  size="small"
+                  variant="outlined"
+                  onClick={() => setFormData({ email: 'admin@example.com', password: 'admin123' })}
+                  sx={{ cursor: 'pointer' }}
+                />
+              </Box>
+            </Paper>
 
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
               <TextField

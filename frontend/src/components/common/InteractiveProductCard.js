@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { addToCart } from '../../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../../store/slices/wishlistSlice';
+import { formatPrice } from '../../utils/currency';
 import { toast } from 'react-toastify';
 // Animation will be handled with CSS transitions
 
@@ -300,35 +301,40 @@ const InteractiveProductCard = ({ product, index = 0 }) => {
           </Box>
 
           {/* Price */}
-          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mb: 2 }}>
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 'bold',
-                color: 'primary.main',
-              }}
-            >
-              ${product.price.toFixed(2)}
+          <Box sx={{ mb: 1.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 'bold',
+                  color: 'primary.main',
+                }}
+              >
+                ${product.price.toFixed(2)}
+              </Typography>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      textDecoration: 'line-through',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    ${product.originalPrice.toFixed(2)}
+                  </Typography>
+                  <Chip
+                    label={`Save $${(product.originalPrice - product.price).toFixed(2)}`}
+                    size="small"
+                    color="success"
+                    sx={{ height: 20, fontSize: '0.7rem' }}
+                  />
+                </>
+              )}
+            </Box>
+            <Typography variant="caption" sx={{ color: '#0284c7', fontWeight: 600, display: 'block' }}>
+              ≈ {formatPrice(product.price, 'ETB')}
             </Typography>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    textDecoration: 'line-through',
-                    color: 'text.secondary',
-                  }}
-                >
-                  ${product.originalPrice.toFixed(2)}
-                </Typography>
-                <Chip
-                  label={`Save $${(product.originalPrice - product.price).toFixed(2)}`}
-                  size="small"
-                  color="success"
-                  sx={{ height: 20, fontSize: '0.7rem' }}
-                />
-              </>
-            )}
           </Box>
 
           {/* Stock Status */}

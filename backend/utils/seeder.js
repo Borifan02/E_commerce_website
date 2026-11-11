@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const Coupon = require('../models/Coupon');
 
 dotenv.config();
 
@@ -247,7 +248,7 @@ const products = [
     description: 'Now with a 6.8” display and thinner borders, adjustable warm light, up to 10 weeks of battery life, and 20% faster turns. Purpose-built for reading: with a flush-front design and 300 ppi glare-free display that reads like real paper.',
     price: 149.99,
     category: 'Electronics',
-    brand: 'Amazon',
+    brand: 'Kindle',
     images: [
       'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?w=800&q=80'
     ],
@@ -276,6 +277,80 @@ const seedData = async () => {
     // Insert sample products
     const insertedProducts = await Product.insertMany(products);
     console.log(`✅ ${insertedProducts.length} products added successfully!`);
+
+    // Seed sample coupons
+    await Coupon.deleteMany();
+    const sampleCoupons = [
+      {
+        code: 'WELCOME10',
+        discountType: 'percentage',
+        discountAmount: 10,
+        minOrderAmount: 20,
+        maxDiscount: 50,
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        isActive: true,
+      },
+      {
+        code: 'SUPER20',
+        discountType: 'percentage',
+        discountAmount: 20,
+        minOrderAmount: 100,
+        maxDiscount: 100,
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        isActive: true,
+      },
+      {
+        code: 'FLAT15',
+        discountType: 'fixed',
+        discountAmount: 15,
+        minOrderAmount: 50,
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        isActive: true,
+      },
+    ];
+    await Coupon.insertMany(sampleCoupons);
+    console.log(`✅ ${sampleCoupons.length} promotional coupons added successfully!`);
+
+    // Ensure Administrators exist
+    const adminEmail = 'admin@ecommerce.com';
+    let admin = await User.findOne({ email: adminEmail });
+    if (!admin) {
+      await User.create({
+        name: 'System Administrator',
+        email: adminEmail,
+        password: 'admin123456',
+        role: 'admin',
+        isEmailVerified: true,
+      });
+      console.log('✅ Admin user created: admin@ecommerce.com (Password: admin123456)');
+    } else {
+      admin.role = 'admin';
+      await admin.save();
+      console.log('✅ Admin verified: admin@ecommerce.com');
+    }
+
+    let demoAdmin = await User.findOne({ email: 'admin@example.com' });
+    if (!demoAdmin) {
+      await User.create({
+        name: 'Demo Admin',
+        email: 'admin@example.com',
+        password: 'admin123',
+        role: 'admin',
+        isEmailVerified: true,
+      });
+      console.log('✅ Demo admin created: admin@example.com (Password: admin123)');
+    } else {
+      demoAdmin.role = 'admin';
+      await demoAdmin.save();
+    }
+
+    // Promote developer account
+    const devUser = await User.findOne({ email: 'dabasaborifan@gmail.com' });
+    if (devUser) {
+      devUser.role = 'admin';
+      await devUser.save();
+      console.log('✅ Promoted dabasaborifan@gmail.com to Admin');
+    }
 
     console.log('\n📦 Sample Products:');
     insertedProducts.slice(0, 5).forEach(p => {

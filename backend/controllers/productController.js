@@ -52,17 +52,36 @@ exports.getProducts = async (req, res, next) => {
 
     // Search
     if (req.query.search) {
-      query.$text = { $search: req.query.search };
+      const searchRegex = { $regex: req.query.search, $options: 'i' };
+      query.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { brand: searchRegex }
+      ];
     }
 
     // Sort
     let sort = { createdAt: -1 };
     if (req.query.sort) {
-      const sortField = req.query.sort;
-      const validSortFields = ['price', 'rating', 'createdAt', 'name'];
-      if (validSortFields.includes(sortField)) {
-        sort = {};
-        sort[sortField] = req.query.order === 'desc' ? -1 : 1;
+      switch (req.query.sort) {
+        case 'price_asc':
+          sort = { price: 1 };
+          break;
+        case 'price_desc':
+          sort = { price: -1 };
+          break;
+        case 'rating':
+          sort = { rating: -1 };
+          break;
+        case 'newest':
+          sort = { createdAt: -1 };
+          break;
+        default:
+          const validSortFields = ['price', 'rating', 'createdAt', 'name'];
+          if (validSortFields.includes(req.query.sort)) {
+            sort = {};
+            sort[req.query.sort] = req.query.order === 'desc' ? -1 : 1;
+          }
       }
     }
 

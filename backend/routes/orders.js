@@ -17,7 +17,7 @@ router.post('/', protect, [
   body('shippingAddress.zipCode').trim().isLength({ min: 3 }).withMessage('Zip code is required'),
   body('shippingAddress.country').trim().isLength({ min: 2 }).withMessage('Country is required'),
   body('shippingAddress.phone').trim().isLength({ min: 10 }).withMessage('Valid phone number is required'),
-  body('paymentMethod').isIn(['stripe', 'paypal', 'cod']).withMessage('Invalid payment method')
+  body('paymentMethod').isIn(['stripe', 'paypal', 'cod', 'telebirr', 'cbe']).withMessage('Invalid payment method')
 ], (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

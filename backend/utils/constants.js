@@ -34,6 +34,8 @@ module.exports = {
     STRIPE: 'stripe',
     PAYPAL: 'paypal',
     COD: 'cod',
+    TELEBIRR: 'telebirr',
+    CBE: 'cbe',
   },
 
   // User roles

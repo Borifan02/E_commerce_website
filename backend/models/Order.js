@@ -63,7 +63,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ['stripe', 'paypal', 'cod']
+    enum: ['stripe', 'paypal', 'cod', 'telebirr', 'cbe']
   },
   paymentResult: {
     id: String,
@@ -85,6 +85,14 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0.0
+  },
+  discountPrice: {
+    type: Number,
+    default: 0.0
+  },
+  couponCode: {
+    type: String,
+    default: null
   },
   totalPrice: {
     type: Number,

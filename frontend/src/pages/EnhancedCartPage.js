@@ -7,7 +7,6 @@ import {
   Typography,
   Button,
   Card,
-  CardContent,
   CardMedia,
   Grid,
   IconButton,
@@ -22,17 +21,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Add,
   Remove,
   Delete,
-  ShoppingCart,
   ArrowBack,
   FlashOn,
-  LocalShipping,
   Verified,
   Security,
   RemoveShoppingCart,
@@ -49,13 +44,10 @@ import { toast } from 'react-toastify';
 const EnhancedCartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const cartItems = useSelector(selectCartItems);
   const cartTotal = useSelector(selectCartTotal);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [hoveredItem, setHoveredItem] = useState(null);
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity < 1) {
@@ -206,8 +198,6 @@ const EnhancedCartPage = () => {
             {cartItems.map((item, index) => (
               <Fade in={true} timeout={300} key={item.product}>
                 <Card
-                  onMouseEnter={() => setHoveredItem(item.product)}
-                  onMouseLeave={() => setHoveredItem(null)}
                   sx={{
                     mb: 2,
                     border: '1px solid',

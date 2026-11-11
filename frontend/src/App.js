@@ -11,7 +11,8 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
 import ProductDetailPage from './pages/ProductDetailPage';
-import CartPage from './pages/CartPage';
+import CartPage from './pages/EnhancedCartPage';
+import WishlistPage from './pages/WishlistPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
@@ -40,6 +41,11 @@ function App() {
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={
+            <ProtectedRoute>
+              <WishlistPage />
+            </ProtectedRoute>
+          } />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
@@ -48,7 +54,7 @@ function App() {
           <Route path="/service" element={<InfoPage title="Customer Service" />} />
           <Route path="/registry" element={<InfoPage title="Registry" />} />
           <Route path="/gift-cards" element={<InfoPage title="Gift Cards" />} />
-          <Route path="/sell" element={<InfoPage title="Sell on Amazon Clone" />} />
+          <Route path="/sell" element={<InfoPage title="Sell on EthioMart" />} />
           <Route path="/about" element={<InfoPage title="About Us" />} />
           <Route path="/contact" element={<InfoPage title="Contact Us" />} />
           <Route path="/help" element={<InfoPage title="Help Center" />} />

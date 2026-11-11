@@ -3,14 +3,13 @@ import {
   AppBar,
   Toolbar,
   Typography,
-
   IconButton,
   Badge,
   Box,
   Menu,
   MenuItem,
   InputBase,
-
+  Divider,
 } from '@mui/material';
 import {
   ShoppingCart,
@@ -18,11 +17,16 @@ import {
   AccountCircle,
   Menu as MenuIcon,
   Clear,
+  Favorite,
+  AdminPanelSettings,
+  Inventory,
+  ReceiptLong,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { selectCartItemsCount } from '../../store/slices/cartSlice';
+import { getStoredCurrency, setStoredCurrency } from '../../utils/currency';
 import SearchSuggestions from '../common/SearchSuggestions';
 
 const Navbar = () => {
@@ -31,12 +35,28 @@ const Navbar = () => {
 
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const cartItemsCount = useSelector(selectCartItemsCount);
+  const { items: wishlistItems = [] } = useSelector((state) => state.wishlist || {});
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [currencyMenuAnchor, setCurrencyMenuAnchor] = useState(null);
+  const [currency, setCurrency] = useState(getStoredCurrency());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
   const searchInputRef = useRef(null);
+
+  // Sync currency changes across windows/components
+  useEffect(() => {
+    const handleCurrencyChange = () => setCurrency(getStoredCurrency());
+    window.addEventListener('currencyChange', handleCurrencyChange);
+    return () => window.removeEventListener('currencyChange', handleCurrencyChange);
+  }, []);
+
+  const handleCurrencySelect = (newCurr) => {
+    setStoredCurrency(newCurr);
+    setCurrency(newCurr);
+    setCurrencyMenuAnchor(null);
+  };
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -102,14 +122,14 @@ const Navbar = () => {
             display: 'flex',
             alignItems: 'center',
             fontSize: '1.5rem',
-            letterSpacing: '-1px'
+            letterSpacing: '-0.5px'
           }}
           onClick={() => navigate('/')}
         >
-          amazon<span style={{ color: '#febd69', fontSize: '1rem', marginTop: '-8px' }}>clone</span>
+          Ethio<span style={{ color: '#febd69', fontSize: '1.2rem', marginLeft: '2px', fontWeight: 800 }}>Mart</span>
         </Typography>
 
-        {/* Location/Deliver To (Mock) */}
+        {/* Location/Deliver To */}
         <Box
           sx={{
             display: { xs: 'none', md: 'flex' },
@@ -120,9 +140,10 @@ const Navbar = () => {
             p: 1,
             '&:hover': { border: '1px solid white', borderRadius: 1 }
           }}
+          onClick={() => navigate('/products')}
         >
-          <Typography variant="body2" sx={{ color: '#ccc', fontSize: '12px' }}>Deliver to</Typography>
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Select Location</Typography>
+          <Typography variant="body2" sx={{ color: '#ccc', fontSize: '11px' }}>Deliver to</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '13px' }}>🇪🇹 Ethiopia</Typography>
         </Box>
 
         {/* Enhanced Search Bar with Suggestions */}
@@ -160,7 +181,7 @@ const Navbar = () => {
           </Box>
           <InputBase
             ref={searchInputRef}
-            placeholder="Search Amazon Clone"
+            placeholder="Search products, brands and categories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
@@ -219,6 +240,54 @@ const Navbar = () => {
         {/* Right Actions Cluster */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
+          {/* Currency Selector (ETB / USD) */}
+          <Box
+            onClick={(e) => setCurrencyMenuAnchor(e.currentTarget)}
+            sx={{
+              cursor: 'pointer',
+              display: { xs: 'none', sm: 'flex' },
+              alignItems: 'center',
+              gap: 0.5,
+              px: 1,
+              py: 0.5,
+              border: '1px solid transparent',
+              borderRadius: 1,
+              '&:hover': { border: '1px solid white' },
+            }}
+          >
+            <Typography sx={{ fontSize: '16px' }}>{currency === 'ETB' ? '🇪🇹' : '🇺🇸'}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="caption" sx={{ fontSize: '10px', color: '#ccc', lineHeight: 1 }}>Currency</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: '12px', lineHeight: 1.2 }}>{currency}</Typography>
+            </Box>
+          </Box>
+
+          <Menu
+            anchorEl={currencyMenuAnchor}
+            open={Boolean(currencyMenuAnchor)}
+            onClose={() => setCurrencyMenuAnchor(null)}
+            sx={{ mt: 1 }}
+          >
+            <MenuItem onClick={() => handleCurrencySelect('ETB')} selected={currency === 'ETB'}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography sx={{ fontSize: '18px' }}>🇪🇹</Typography>
+                <Box>
+                  <Typography variant="body2" fontWeight="bold">ETB - Ethiopian Birr</Typography>
+                  <Typography variant="caption" color="text.secondary">Telebirr & CBE standard</Typography>
+                </Box>
+              </Box>
+            </MenuItem>
+            <MenuItem onClick={() => handleCurrencySelect('USD')} selected={currency === 'USD'}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography sx={{ fontSize: '18px' }}>🇺🇸</Typography>
+                <Box>
+                  <Typography variant="body2" fontWeight="bold">USD - US Dollar</Typography>
+                  <Typography variant="caption" color="text.secondary">International Cards</Typography>
+                </Box>
+              </Box>
+            </MenuItem>
+          </Menu>
+
           {/* Account & Lists */}
           <Box
             onClick={isAuthenticated ? handleMenuOpen : () => navigate('/login')}
@@ -255,6 +324,26 @@ const Navbar = () => {
           >
             <Typography variant="body2" sx={{ fontSize: '12px' }}>Returns</Typography>
             <Typography variant="body2" sx={{ fontWeight: 'bold' }}>& Orders</Typography>
+          </Box>
+
+          {/* Wishlist */}
+          <Box
+            onClick={() => navigate(isAuthenticated ? '/wishlist' : '/login')}
+            sx={{
+              cursor: 'pointer',
+              display: { xs: 'none', sm: 'flex' },
+              alignItems: 'center',
+              p: 1,
+              border: '1px solid transparent',
+              '&:hover': { border: '1px solid white', borderRadius: 1 }
+            }}
+          >
+            <Badge badgeContent={wishlistItems.length} color="error" sx={{ mr: 0.5 }}>
+              <Favorite sx={{ fontSize: 24, color: '#febd69' }} />
+            </Badge>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>
+              Wishlist
+            </Typography>
           </Box>
 
           {/* Cart */}
@@ -294,10 +383,27 @@ const Navbar = () => {
             <ShoppingCart sx={{ mr: 1 }} />
             Orders
           </MenuItem>
+          <MenuItem onClick={() => navigate('/wishlist')}>
+            <Favorite sx={{ mr: 1, color: 'error.main' }} />
+            Wishlist ({wishlistItems.length})
+          </MenuItem>
           {user?.role === 'admin' && (
-            <MenuItem onClick={() => navigate('/admin')}>
-              Admin Dashboard
-            </MenuItem>
+            <Box>
+              <Divider sx={{ my: 1 }} />
+              <MenuItem onClick={() => navigate('/admin')}>
+                <AdminPanelSettings sx={{ mr: 1, color: 'primary.main' }} />
+                Admin Dashboard
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/admin/products')}>
+                <Inventory sx={{ mr: 1 }} />
+                Manage Products
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/admin/orders')}>
+                <ReceiptLong sx={{ mr: 1 }} />
+                Manage Orders
+              </MenuItem>
+              <Divider sx={{ my: 1 }} />
+            </Box>
           )}
           <MenuItem onClick={handleLogout}>
             Logout
@@ -311,11 +417,13 @@ const Navbar = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontWeight: 'bold' }}>
           <MenuIcon sx={{ mr: 0.5 }} /> All
         </Box>
-        {[{ label: 'Today\'s Deals', path: '/deals' },
-        { label: 'Customer Service', path: '/service' },
-        { label: 'Registry', path: '/registry' },
-        { label: 'Gift Cards', path: '/gift-cards' },
-        { label: 'Sell', path: '/sell' }
+        {[{ label: "Today's Deals", path: '/deals' },
+        { label: 'All Products', path: '/products' },
+        { label: 'Electronics', path: '/products?category=Electronics' },
+        { label: 'Fashion & Clothing', path: '/products?category=Clothing' },
+        { label: 'Home & Living', path: '/products?category=Home%20%26%20Garden' },
+        { label: 'Customer Support', path: '/service' },
+        { label: 'Become a Seller', path: '/sell' }
         ].map((item) => (
           <Typography
             key={item.label}

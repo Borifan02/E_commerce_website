@@ -311,3 +311,50 @@ exports.resetPassword = async (req, res, next) => {
     next(new AppError('Failed to reset password', 500));
   }
 };
+
+// @desc    Update password
+// @route   PUT /api/auth/updatepassword
+// @access  Private
+exports.updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      throw new BadRequestError('Please provide both current and new password');
+    }
+
+    if (newPassword.length < CONSTANTS.VALIDATION.MIN_PASSWORD_LENGTH) {
+      throw new BadRequestError(
+        `New password must be at least ${CONSTANTS.VALIDATION.MIN_PASSWORD_LENGTH} characters`
+      );
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      throw new NotFoundError('User');
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      throw new UnauthorizedError('Current password is incorrect');
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    const token = generateToken(user._id);
+
+    logger.info(`Password updated for user: ${user.email}`);
+    res.json({
+      success: true,
+      token,
+      message: 'Password updated successfully',
+    });
+  } catch (error) {
+    logger.error('Update password error:', error);
+    if (error instanceof AppError) {
+      return next(error);
+    }
+    next(new AppError('Failed to update password', 500));
+  }
+};

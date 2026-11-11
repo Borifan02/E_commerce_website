@@ -39,6 +39,7 @@ import {
 import { fetchProduct, createReview } from '../store/slices/productSlice';
 import { addToCart } from '../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
+import { formatPrice } from '../utils/currency';
 import { toast } from 'react-toastify';
 import ImageLightbox from '../components/common/ImageLightbox';
 import { ProductDetailSkeleton } from '../components/common/SkeletonLoader';
@@ -330,7 +331,7 @@ const ProductDetailPage = () => {
 
             {/* Price Section */}
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 0.5 }}>
                 <Typography variant="h4" color="error.main" sx={{ fontWeight: 700 }}>
                   ${product.price}
                 </Typography>
@@ -354,8 +355,11 @@ const ProductDetailPage = () => {
                   </>
                 )}
               </Box>
+              <Typography variant="subtitle1" sx={{ color: '#0284c7', fontWeight: 600, mb: 0.5 }}>
+                ≈ {formatPrice(product.price, 'ETB')}
+              </Typography>
               <Typography variant="body2" color="text.secondary">
-                Inclusive of all taxes
+                Inclusive of all taxes • Pay securely with Telebirr, CBE, or Card
               </Typography>
             </Box>
 

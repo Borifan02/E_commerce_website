@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const Coupon = require('../models/Coupon');
 const { sendOrderConfirmation } = require('../utils/emailService');
 const logger = require('../utils/logger');
 const { NotFoundError, BadRequestError, AppError, ForbiddenError } = require('../utils/errors');
@@ -18,13 +19,33 @@ const createOrderWithoutTransaction = async (req, orderItemsWithDetails, itemsPr
   const {
     shippingAddress,
     paymentMethod,
+    couponCode,
   } = req.body;
 
   // Calculate tax and shipping
-  const taxPrice = itemsPrice * CONSTANTS.TAX.RATE;
+  const taxPrice = Math.round(itemsPrice * CONSTANTS.TAX.RATE * 100) / 100;
   const shippingPrice = itemsPrice > CONSTANTS.SHIPPING.FREE_THRESHOLD 
     ? 0 
     : CONSTANTS.SHIPPING.STANDARD_COST;
+
+  // Check coupon discount
+  let discountPrice = 0;
+  let appliedCouponCode = null;
+  if (couponCode) {
+    try {
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim() });
+      if (coupon && coupon.isValid(itemsPrice).valid) {
+        discountPrice = coupon.calculateDiscount(itemsPrice);
+        appliedCouponCode = coupon.code;
+        coupon.timesUsed = (coupon.timesUsed || 0) + 1;
+        await coupon.save();
+      }
+    } catch (couponErr) {
+      logger.warn('Coupon processing error (non-fatal):', couponErr.message);
+    }
+  }
+
+  const totalPrice = Math.max(0, Math.round((itemsPrice + taxPrice + shippingPrice - discountPrice) * 100) / 100);
 
   // Create order
   const order = await Order.create({
@@ -35,6 +56,9 @@ const createOrderWithoutTransaction = async (req, orderItemsWithDetails, itemsPr
     itemsPrice,
     taxPrice,
     shippingPrice,
+    discountPrice,
+    couponCode: appliedCouponCode,
+    totalPrice,
   });
 
   // Update product stock
@@ -106,10 +130,29 @@ exports.createOrder = async (req, res, next) => {
       useSession = true;
 
       // Calculate tax and shipping
-      const taxPrice = itemsPrice * CONSTANTS.TAX.RATE;
+      const taxPrice = Math.round(itemsPrice * CONSTANTS.TAX.RATE * 100) / 100;
       const shippingPrice = itemsPrice > CONSTANTS.SHIPPING.FREE_THRESHOLD 
         ? 0 
         : CONSTANTS.SHIPPING.STANDARD_COST;
+
+      // Check coupon discount
+      let discountPrice = 0;
+      let appliedCouponCode = null;
+      if (req.body.couponCode) {
+        try {
+          const coupon = await Coupon.findOne({ code: req.body.couponCode.toUpperCase().trim() });
+          if (coupon && coupon.isValid(itemsPrice).valid) {
+            discountPrice = coupon.calculateDiscount(itemsPrice);
+            appliedCouponCode = coupon.code;
+            coupon.timesUsed = (coupon.timesUsed || 0) + 1;
+            await coupon.save({ session });
+          }
+        } catch (couponErr) {
+          logger.warn('Coupon processing error (non-fatal):', couponErr.message);
+        }
+      }
+
+      const totalPrice = Math.max(0, Math.round((itemsPrice + taxPrice + shippingPrice - discountPrice) * 100) / 100);
 
       // Create order within transaction
       const order = await Order.create([{
@@ -120,6 +163,9 @@ exports.createOrder = async (req, res, next) => {
         itemsPrice,
         taxPrice,
         shippingPrice,
+        discountPrice,
+        couponCode: appliedCouponCode,
+        totalPrice,
       }], { session });
 
       // Update product stock within transaction

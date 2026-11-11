@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: ecommerce-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install --production=false
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 30d
+      - key: CLIENT_URL
+        sync: false
+      - key: ETB_EXCHANGE_RATE
+        value: "120.0"
+      - key: TELEBIRR_MERCHANT_PHONE
+        value: "0911223344"
+      - key: TELEBIRR_MERCHANT_NAME
+        value: "E-Store Official Ethiopia"
+      - key: CBE_ACCOUNT_NUMBER
+        value: "1000123456789"
+      - key: CBE_ACCOUNT_NAME
+        value: "E-Store Retail PLC"
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+

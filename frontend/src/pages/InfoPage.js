@@ -130,7 +130,7 @@ const InfoPage = ({ title }) => {
                         </ListItem>
                         <ListItem>
                             <ListItemIcon><Email /></ListItemIcon>
-                            <ListItemText primary="Email" secondary="support@amazonclone.com" />
+                            <ListItemText primary="Email" secondary="support@ethiomart.et" />
                         </ListItem>
                     </List>
                 </Box>
@@ -141,9 +141,9 @@ const InfoPage = ({ title }) => {
     const renderRegistry = () => (
         <Box textAlign="center" py={5}>
             <CardGiftcard sx={{ fontSize: 80, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h4" gutterBottom>Celebrate with Amazon Clone Registry</Typography>
+            <Typography variant="h4" gutterBottom>Celebrate with EthioMart Gift Registry</Typography>
             <Typography paragraph color="text.secondary" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
-                Whether you're planning a wedding, a baby shower, or a housewarming party, our registry makes it easy for your friends and family to find the perfect gift.
+                Whether you're planning a wedding, a graduation, or a holiday celebration, our registry makes it easy for your friends and family to find the perfect gift.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
                 <Button variant="contained" size="large">Create a Registry</Button>
@@ -168,7 +168,7 @@ const InfoPage = ({ title }) => {
                             Hello, how can we help you today? Browse our help topics below or contact us directly.
                         </Typography>
                         <Grid container spacing={2} sx={{ mb: 4 }}>
-                            {['Your Orders', 'Returns & Refunds', 'Digital Services', 'Manage Prime', 'Payment Settings', 'Account Security'].map((item) => (
+                            {['Your Orders', 'Returns & Refunds', 'Digital Services', 'Payment (Telebirr & CBE)', 'Payment Settings', 'Account Security'].map((item) => (
                                 <Grid item xs={12} sm={4} key={item}>
                                     <Paper variant="outlined" sx={{ p: 2, cursor: 'pointer', '&:hover': { bgcolor: '#f9f9f9', borderColor: 'primary.main' } }}>
                                         <Typography variant="subtitle1" fontWeight="bold">{item}</Typography>
@@ -184,29 +184,29 @@ const InfoPage = ({ title }) => {
             case "Gift Cards":
                 return (
                     <Box>
-                        <Typography paragraph>Shop for Gift Cards for every occasion.</Typography>
+                        <Typography paragraph>Shop for digital vouchers and gift cards for every occasion.</Typography>
                         <Grid container spacing={3}>
                             {[1, 2, 3].map(i => (
                                 <Grid item xs={12} sm={4} key={i}>
-                                    <Card sx={{ bgcolor: i === 1 ? '#000' : i === 2 ? '#1a237e' : '#b71c1c', color: 'white', height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>
-                                        <Typography variant="h5">Amazon Clone Gift Card</Typography>
+                                    <Card sx={{ bgcolor: i === 1 ? '#0088cc' : i === 2 ? '#6b21a8' : '#1e293b', color: 'white', height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>
+                                        <Typography variant="h5">EthioMart Voucher</Typography>
                                     </Card>
                                 </Grid>
                             ))}
                         </Grid>
                         <Box mt={4}>
-                            <Button variant="contained">Reload Your Balance</Button>
+                            <Button variant="contained">Redeem Voucher</Button>
                         </Box>
                     </Box>
                 );
-            case "Sell on Amazon Clone":
+            case "Sell on EthioMart":
                 return (
                     <Box textAlign="center">
                         <Storefront sx={{ fontSize: 60, color: 'secondary.main', mb: 2 }} />
-                        <Typography variant="h4" gutterBottom>Become an Amazon Clone Seller</Typography>
-                        <Typography paragraph>Reach millions of customers and grow your business with us.</Typography>
+                        <Typography variant="h4" gutterBottom>Become an EthioMart Verified Seller</Typography>
+                        <Typography paragraph>Reach customers across Addis Ababa and all regional cities in Ethiopia.</Typography>
                         <Grid container spacing={2} justifyContent="center" sx={{ my: 4 }}>
-                            {['Low Fees', 'Secure Payments', 'Global Reach', '24/7 Support'].map(feat => (
+                            {['Zero Listing Fees', 'Telebirr & CBE Payouts', 'Nationwide Reach', '24/7 Merchant Support'].map(feat => (
                                 <Grid item xs={6} sm={3} key={feat}>
                                     <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
                                         <CheckCircle color="success" sx={{ mb: 1 }} />
@@ -215,7 +215,7 @@ const InfoPage = ({ title }) => {
                                 </Grid>
                             ))}
                         </Grid>
-                        <Button variant="contained" size="large" color="secondary">Sign Up to Sell</Button>
+                        <Button variant="contained" size="large" color="primary">Apply to Sell on EthioMart</Button>
                     </Box>
                 );
             case "Contact Us":
@@ -260,7 +260,7 @@ const InfoPage = ({ title }) => {
                             Last updated: December 11, 2025
                         </Typography>
                         <Typography paragraph>
-                            At Amazon Clone, we know that you care how information about you is used and shared, and we appreciate your trust that we will do so carefully and sensibly.
+                            At EthioMart, we know that you care how information about you is used and shared, and we appreciate your trust that we will do so carefully and sensibly.
                         </Typography>
                         <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>Information We Collect</Typography>
                         <Typography paragraph>
@@ -279,7 +279,7 @@ const InfoPage = ({ title }) => {
                     <Box>
                         <Typography variant="h5" gutterBottom>Returns Center</Typography>
                         <Typography paragraph>
-                            Props to you for giving it a shot! If it didn't work out, you can return most items within 30 days of delivery.
+                            Props to you for giving it a shot! If it didn't work out, you can return most items within 7–14 days of delivery.
                         </Typography>
                         <Button variant="contained" sx={{ mb: 4 }}>Start a Return</Button>
                         {renderFAQ()}
@@ -290,16 +290,16 @@ const InfoPage = ({ title }) => {
                     <Box>
                         <Typography variant="h5" gutterBottom>About {title}</Typography>
                         <Typography paragraph>
-                            Amazon Clone is guided by four principles: customer obsession rather than competitor focus, passion for invention, commitment to operational excellence, and long-term thinking.
+                            EthioMart is Ethiopia’s premier digital e-commerce marketplace, connecting verified local merchants and international brands with customers across Addis Ababa and nationwide with seamless Telebirr and CBE payment integration.
                         </Typography>
                         <Typography paragraph>
-                            We strive to have the positive impact on customers, employees, small businesses, the economy, and communities.
+                            We strive to have the positive impact on customers, employees, small businesses, the economy, and local communities.
                         </Typography>
                         <Grid container spacing={2} sx={{ mt: 2 }}>
                             <Grid item xs={12} md={6}>
                                 <Paper sx={{ p: 4, bgcolor: '#f5f5f5', height: '200px' }}>
                                     <Typography variant="h6">Our Mission</Typography>
-                                    <Typography>To be Earth's most customer-centric company.</Typography>
+                                    <Typography>To make modern digital commerce and rapid delivery accessible to everyone in Ethiopia.</Typography>
                                 </Paper>
                             </Grid>
                             <Grid item xs={12} md={6}>

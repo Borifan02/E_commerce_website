@@ -3,36 +3,38 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#131921', // Amazon-like dark blue header
-            light: '#232f3e',
-            dark: '#000000',
+            main: '#0f172a', // Modern slate navy
+            light: '#1e293b',
+            dark: '#020617',
             contrastText: '#ffffff',
         },
         secondary: {
-            main: '#febd69', // Amazon-like orange for actions
-            light: '#ffcf8b',
-            dark: '#c88d3e',
+            main: '#f59e0b', // Ethiopian amber/gold accent
+            light: '#fbbf24',
+            dark: '#d97706',
             contrastText: '#111111',
         },
         background: {
-            default: '#eaeded', // Light gray background
+            default: '#f8fafc', // Clean modern slate background
             paper: '#ffffff',
         },
         text: {
-            primary: '#0F1111',
-            secondary: '#565959',
+            primary: '#0f172a',
+            secondary: '#475569',
         },
         error: {
-            main: '#B12704',
+            main: '#dc2626',
         },
         success: {
-            main: '#067D62',
+            main: '#059669',
         },
     },
     typography: {
         fontFamily: [
-            '"Amazon Ember"',
-            'Arial',
+            '"Roboto"',
+            '"Segoe UI"',
+            '-apple-system',
+            'BlinkMacSystemFont',
             'sans-serif',
         ].join(','),
         h1: { fontSize: '2.5rem', fontWeight: 700 },
