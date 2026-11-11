@@ -33,7 +33,7 @@ import { toast } from 'react-toastify';
 const InteractiveProductCard = ({ product, index = 0 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -45,6 +45,10 @@ const InteractiveProductCard = ({ product, index = 0 }) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
+    if (user?.role === 'admin') {
+      toast.info('Admins cannot add items to cart. Cart is reserved for customer accounts.');
+      return;
+    }
     dispatch(addToCart({
       product: product._id,
       name: product.name,
@@ -350,7 +354,27 @@ const InteractiveProductCard = ({ product, index = 0 }) => {
         </CardContent>
 
         <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
-          {product.stock > 0 ? (
+          {user?.role === 'admin' ? (
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/admin/products');
+              }}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 'bold',
+                py: 1,
+                borderWidth: 2,
+                '&:hover': { borderWidth: 2 },
+              }}
+            >
+              ⚙️ Manage in Admin
+            </Button>
+          ) : product.stock > 0 ? (
             <>
               {/* Quantity Selector */}
               <Box

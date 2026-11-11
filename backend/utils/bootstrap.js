@@ -208,52 +208,40 @@ const defaultCoupons = [
 
 /**
  * Auto-bootstrap database on startup:
- * 1. Guarantees admin user exists (admin@ecommerce.com / admin123456)
- * 2. Promotes user's personal email to admin if present
+ * 1. Guarantees ONLY ONE Administrator exists: admin@ecommerce.com / admin123456
+ * 2. Ensures all other users (e.g. dabasaborifan@gmail.com) have role: 'user' (Customer role for buying products)
  * 3. Populates product catalog if empty
  * 4. Populates coupons if empty
  */
 exports.bootstrapDatabase = async () => {
   try {
-    // 1. Ensure Admin User exists
-    let admin = await User.findOne({ email: 'admin@ecommerce.com' });
+    const singleAdminEmail = 'admin@ecommerce.com';
+
+    // 1. Ensure the ONLY designated Admin user exists
+    let admin = await User.findOne({ email: singleAdminEmail });
     if (!admin) {
       admin = await User.create({
         name: 'System Administrator',
-        email: 'admin@ecommerce.com',
+        email: singleAdminEmail,
         password: 'admin123456',
         role: 'admin',
         isEmailVerified: true,
       });
-      logger.info('✅ Auto-Bootstrap: Default admin created (admin@ecommerce.com / admin123456)');
+      logger.info('✅ Auto-Bootstrap: Sole Admin created (admin@ecommerce.com / admin123456)');
     } else if (admin.role !== 'admin') {
       admin.role = 'admin';
       await admin.save();
     }
 
-    // Also support admin@example.com (common legacy demo login)
-    let legacyAdmin = await User.findOne({ email: 'admin@example.com' });
-    if (!legacyAdmin) {
-      await User.create({
-        name: 'Demo Admin',
-        email: 'admin@example.com',
-        password: 'admin123',
-        role: 'admin',
-        isEmailVerified: true,
-      });
-      logger.info('✅ Auto-Bootstrap: Legacy demo admin created (admin@example.com / admin123)');
-    } else if (legacyAdmin.role !== 'admin') {
-      legacyAdmin.role = 'admin';
-      await legacyAdmin.save();
-    }
+    // Remove legacy demo admin
+    await User.deleteOne({ email: 'admin@example.com' });
 
-    // Promote developer's account if it exists
-    const devUser = await User.findOne({ email: 'dabasaborifan@gmail.com' });
-    if (devUser && devUser.role !== 'admin') {
-      devUser.role = 'admin';
-      await devUser.save();
-      logger.info('✅ Auto-Bootstrap: Promoted dabasaborifan@gmail.com to Admin');
-    }
+    // Enforce SINGLE ADMIN: Any other account is strictly a customer (role: 'user')
+    await User.updateMany(
+      { email: { $ne: singleAdminEmail }, role: 'admin' },
+      { $set: { role: 'user' } }
+    );
+    logger.info('✅ Role-Based Access: Verified admin@ecommerce.com is the sole Administrator. All other accounts assigned customer role.');
 
     // 2. Ensure Products exist
     const productCount = await Product.countDocuments();

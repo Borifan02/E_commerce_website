@@ -24,6 +24,8 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import InfoPage from './pages/InfoPage';
+import DealsPage from './pages/DealsPage';
+import CustomerSupportPage from './pages/CustomerSupportPage';
 
 // Protected Route Component
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -49,15 +51,15 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Info Pages */}
-          <Route path="/deals" element={<InfoPage title="Today's Deals" />} />
-          <Route path="/service" element={<InfoPage title="Customer Service" />} />
+          {/* Live Deals & Customer Support Pages */}
+          <Route path="/deals" element={<DealsPage />} />
+          <Route path="/service" element={<CustomerSupportPage />} />
+          <Route path="/contact" element={<CustomerSupportPage />} />
+          <Route path="/help" element={<CustomerSupportPage />} />
           <Route path="/registry" element={<InfoPage title="Registry" />} />
           <Route path="/gift-cards" element={<InfoPage title="Gift Cards" />} />
           <Route path="/sell" element={<InfoPage title="Sell on EthioMart" />} />
           <Route path="/about" element={<InfoPage title="About Us" />} />
-          <Route path="/contact" element={<InfoPage title="Contact Us" />} />
-          <Route path="/help" element={<InfoPage title="Help Center" />} />
           <Route path="/shipping" element={<InfoPage title="Shipping Information" />} />
           <Route path="/returns" element={<InfoPage title="Returns & Replacements" />} />
           <Route path="/privacy" element={<InfoPage title="Privacy Policy" />} />
@@ -79,7 +81,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/checkout" element={
-            <ProtectedRoute>
+            <ProtectedRoute customerOnly>
               <CheckoutPage />
             </ProtectedRoute>
           } />

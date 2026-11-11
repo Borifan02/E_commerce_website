@@ -85,28 +85,24 @@ const LoginPage = () => {
               </Alert>
             )}
 
-            {/* Quick Demo Credentials Assistant */}
+            {/* Quick Single Admin Credentials Assistant */}
             <Paper variant="outlined" sx={{ p: 2, mb: 2, width: '100%', bgcolor: '#f8fafc', borderRadius: 2 }}>
               <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#475569', display: 'block', mb: 1 }}>
-                🔑 Pre-Configured Admin Logins (Click to Autofill):
+                🔑 Sole System Administrator Account (Click to Autofill):
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 <Chip
-                  label="Admin (admin@ecommerce.com)"
+                  label="System Admin (admin@ecommerce.com / admin123456)"
                   size="small"
                   color="primary"
-                  variant="outlined"
+                  variant="filled"
                   onClick={() => setFormData({ email: 'admin@ecommerce.com', password: 'admin123456' })}
-                  sx={{ cursor: 'pointer', fontWeight: 500 }}
-                />
-                <Chip
-                  label="Demo Admin (admin@example.com)"
-                  size="small"
-                  variant="outlined"
-                  onClick={() => setFormData({ email: 'admin@example.com', password: 'admin123' })}
-                  sx={{ cursor: 'pointer' }}
+                  sx={{ cursor: 'pointer', fontWeight: 600 }}
                 />
               </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontSize: '11px' }}>
+                Role-based access: Admin manages catalog and orders. Sign in as Customer to add to cart and purchase.
+              </Typography>
             </Paper>
 
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>

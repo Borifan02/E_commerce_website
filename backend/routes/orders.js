@@ -17,12 +17,21 @@ router.post('/', protect, [
   body('shippingAddress.zipCode').trim().isLength({ min: 3 }).withMessage('Zip code is required'),
   body('shippingAddress.country').trim().isLength({ min: 2 }).withMessage('Country is required'),
   body('shippingAddress.phone').trim().isLength({ min: 10 }).withMessage('Valid phone number is required'),
+  body('shippingAddress.name').trim().notEmpty().withMessage('Shipping name is required'),
+  body('shippingAddress.street').trim().notEmpty().withMessage('Street address is required'),
+  body('shippingAddress.city').trim().notEmpty().withMessage('City is required'),
+  body('shippingAddress.state').optional({ checkFalsy: true }).trim(),
+  body('shippingAddress.zipCode').optional({ checkFalsy: true }).trim(),
+  body('shippingAddress.country').optional({ checkFalsy: true }).trim(),
+  body('shippingAddress.phone').trim().isLength({ min: 7 }).withMessage('Valid contact phone number is required'),
   body('paymentMethod').isIn(['stripe', 'paypal', 'cod', 'telebirr', 'cbe']).withMessage('Invalid payment method')
 ], (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    const firstError = errors.array()[0]?.msg || 'Validation failed';
     return res.status(400).json({
       success: false,
+      message: firstError,
       errors: errors.array()
     });
   }

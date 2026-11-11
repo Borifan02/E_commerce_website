@@ -108,6 +108,31 @@ const TelebirrPayment = ({ order, onSuccess, initialPhone = '' }) => {
     }
   };
 
+  const handleSimulateMockPayment = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg('');
+      const mockTx = `TLB-MOCK-${Math.floor(100000 + Math.random() * 900000)}`;
+      setTransactionId(mockTx);
+      const res = await api.post('/api/payment/telebirr/verify', {
+        orderId: order._id,
+        transactionId: mockTx,
+        phoneNumber: customerPhone || '0911223344',
+      });
+
+      if (res.data?.success) {
+        toast.success('⚡ Mock Telebirr payment verified successfully!');
+        if (onSuccess) {
+          onSuccess(res.data.order);
+        }
+      }
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || 'Mock payment simulation failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
@@ -269,6 +294,19 @@ const TelebirrPayment = ({ order, onSuccess, initialPhone = '' }) => {
               size="medium"
             />
           </Box>
+
+          <Button
+            type="button"
+            variant="outlined"
+            color="info"
+            fullWidth
+            size="medium"
+            disabled={submitting}
+            onClick={handleSimulateMockPayment}
+            sx={{ mb: 2, fontWeight: 'bold', borderStyle: 'dashed', borderWidth: 2 }}
+          >
+            ⚡ Instant Test / Mock Pay (Simulate Telebirr Success)
+          </Button>
 
           <Button
             type="submit"

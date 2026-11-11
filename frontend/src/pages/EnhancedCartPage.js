@@ -31,6 +31,7 @@ import {
   Verified,
   Security,
   RemoveShoppingCart,
+  AdminPanelSettings,
 } from '@mui/icons-material';
 import {
   selectCartItems,
@@ -44,6 +45,7 @@ import { toast } from 'react-toastify';
 const EnhancedCartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const cartItems = useSelector(selectCartItems);
   const cartTotal = useSelector(selectCartTotal);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -85,6 +87,50 @@ const EnhancedCartPage = () => {
   const shipping = subtotal > 100 ? 0 : 10;
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax;
+
+  if (user?.role === 'admin') {
+    return (
+      <Container maxWidth="md" sx={{ py: 8 }}>
+        <Paper
+          elevation={2}
+          sx={{
+            textAlign: 'center',
+            py: 6,
+            px: 4,
+            borderRadius: 3,
+            border: '1px solid #bfdbfe',
+            bgcolor: '#f8fafc',
+          }}
+        >
+          <AdminPanelSettings color="primary" sx={{ fontSize: 80, mb: 2 }} />
+          <Typography variant="h4" gutterBottom fontWeight="bold">
+            Administrator Mode
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ maxWidth: 520, mx: 'auto', mb: 4 }}>
+            In our role-based access control system, the Shopping Cart and Checkout are strictly reserved for <strong>Customer</strong> accounts to buy products. As the Administrator, your role is to manage the catalog, pricing, and fulfill orders.
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate('/admin')}
+              sx={{ px: 4, fontWeight: 'bold' }}
+            >
+              Go to Admin Dashboard
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => navigate('/admin/products')}
+              sx={{ px: 4, fontWeight: 'bold' }}
+            >
+              Manage Products
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (

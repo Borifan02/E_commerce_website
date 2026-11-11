@@ -22,6 +22,16 @@ const createOrderWithoutTransaction = async (req, orderItemsWithDetails, itemsPr
     couponCode,
   } = req.body;
 
+  const cleanShippingAddress = {
+    name: shippingAddress?.name || 'Customer',
+    street: shippingAddress?.street || 'Main Street',
+    city: shippingAddress?.city || 'Addis Ababa',
+    state: shippingAddress?.state || shippingAddress?.city || 'Addis Ababa',
+    zipCode: shippingAddress?.zipCode || '1000',
+    country: shippingAddress?.country || 'Ethiopia',
+    phone: shippingAddress?.phone || '0911223344',
+  };
+
   // Calculate tax and shipping
   const taxPrice = Math.round(itemsPrice * CONSTANTS.TAX.RATE * 100) / 100;
   const shippingPrice = itemsPrice > CONSTANTS.SHIPPING.FREE_THRESHOLD 
@@ -51,7 +61,7 @@ const createOrderWithoutTransaction = async (req, orderItemsWithDetails, itemsPr
   const order = await Order.create({
     user: req.user._id,
     orderItems: orderItemsWithDetails,
-    shippingAddress,
+    shippingAddress: cleanShippingAddress,
     paymentMethod,
     itemsPrice,
     taxPrice,
@@ -75,17 +85,32 @@ const createOrderWithoutTransaction = async (req, orderItemsWithDetails, itemsPr
 
 // @desc    Create new order
 // @route   POST /api/orders
-// @access  Private
+// @access  Private (Customers only)
 exports.createOrder = async (req, res, next) => {
   let session = null;
   let useSession = false;
 
   try {
+    // RBAC: Admins are not allowed to place customer orders
+    if (req.user && req.user.role === 'admin') {
+      throw new ForbiddenError('Administrators are not permitted to place customer orders. Please sign in with a Customer account to buy products.');
+    }
+
     const {
       orderItems,
       shippingAddress,
       paymentMethod,
     } = req.body;
+
+    const cleanShippingAddress = {
+      name: shippingAddress?.name || 'Customer',
+      street: shippingAddress?.street || 'Main Street',
+      city: shippingAddress?.city || 'Addis Ababa',
+      state: shippingAddress?.state || shippingAddress?.city || 'Addis Ababa',
+      zipCode: shippingAddress?.zipCode || '1000',
+      country: shippingAddress?.country || 'Ethiopia',
+      phone: shippingAddress?.phone || '0911223344',
+    };
 
     if (!orderItems || orderItems.length === 0) {
       throw new BadRequestError('No order items');
@@ -158,7 +183,7 @@ exports.createOrder = async (req, res, next) => {
       const order = await Order.create([{
         user: req.user._id,
         orderItems: orderItemsWithDetails,
-        shippingAddress,
+        shippingAddress: cleanShippingAddress,
         paymentMethod,
         itemsPrice,
         taxPrice,

@@ -3,9 +3,13 @@ const logger = require('../utils/logger');
 const { NotFoundError, BadRequestError, ForbiddenError, AppError } = require('../utils/errors');
 
 let stripe = null;
-if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.includes('your_secret_key')) {
+const stripeSecretKey = (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.includes('your_stripe_secret_key'))
+  ? process.env.STRIPE_SECRET_KEY
+  : (process.env.STRIPE_PUBLISHABLE_KEY && process.env.STRIPE_PUBLISHABLE_KEY.startsWith('sk_') ? process.env.STRIPE_PUBLISHABLE_KEY : null);
+
+if (stripeSecretKey) {
   try {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    stripe = require('stripe')(stripeSecretKey);
   } catch (err) {
     logger.warn('Stripe initialization failed, fallback to simulated payments:', err.message);
   }

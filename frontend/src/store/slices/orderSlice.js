@@ -14,9 +14,12 @@ export const createOrder = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || 'Failed to create order'
-      );
+      const errMsg =
+        error.response?.data?.errors?.[0]?.msg ||
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to create order';
+      return rejectWithValue(errMsg);
     }
   }
 );

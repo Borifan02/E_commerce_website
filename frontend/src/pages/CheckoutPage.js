@@ -171,6 +171,43 @@ const CheckoutForm = ({ order, onSuccess }) => {
           </Box>
 
           <Button
+            type="button"
+            variant="outlined"
+            color="primary"
+            fullWidth
+            size="medium"
+            disabled={loading}
+            onClick={async () => {
+              try {
+                setLoading(true);
+                const mockIntentId = `MOCK-CARD-${Date.now()}`;
+                await api.post('/api/payment/confirm', {
+                  orderId: order._id,
+                  paymentIntentId: mockIntentId,
+                });
+                await dispatch(payOrder({
+                  orderId: order._id,
+                  paymentResult: {
+                    id: mockIntentId,
+                    status: 'succeeded',
+                    update_time: new Date().toISOString(),
+                    email_address: 'demo@card.com',
+                  },
+                }));
+                toast.success('⚡ Mock card payment authorized successfully!');
+                onSuccess(order);
+              } catch (err) {
+                toast.error('Mock payment simulation error');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            sx={{ mb: 2, fontWeight: 'bold', borderStyle: 'dashed', borderWidth: 2 }}
+          >
+            ⚡ Instant Test / Mock Pay (Simulate Card Success)
+          </Button>
+
+          <Button
             type="submit"
             variant="contained"
             color="primary"
@@ -272,6 +309,16 @@ const CheckoutPage = () => {
 
   const handlePlaceOrder = async () => {
     try {
+      const safeShippingAddress = {
+        name: addressForm.name?.trim() || 'Customer',
+        street: addressForm.street?.trim() || 'Main Street',
+        city: addressForm.city?.trim() || 'Addis Ababa',
+        state: addressForm.state?.trim() || addressForm.city?.trim() || 'Addis Ababa',
+        zipCode: addressForm.zipCode?.trim() || '1000',
+        country: addressForm.country?.trim() || 'ET',
+        phone: addressForm.phone?.trim() || '0911223344',
+      };
+
       const orderData = {
         orderItems: cartItems.map((item) => ({
           product: item.product || item._id,
@@ -280,7 +327,7 @@ const CheckoutPage = () => {
           price: item.price,
           quantity: item.quantity,
         })),
-        shippingAddress: addressForm,
+        shippingAddress: safeShippingAddress,
         paymentMethod,
         couponCode: appliedCoupon?.code,
       };
@@ -306,7 +353,8 @@ const CheckoutPage = () => {
       setActiveStep(2);
     } catch (error) {
       console.error('Order creation failed:', error);
-      toast.error(error.message || 'Failed to place order');
+      const msg = typeof error === 'string' ? error : (error?.message || 'Failed to place order');
+      toast.error(msg);
     }
   };
 

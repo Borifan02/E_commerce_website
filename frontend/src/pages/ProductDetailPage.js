@@ -49,7 +49,7 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { product, loading } = useSelector((state) => state.products);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
 
   const [quantity, setQuantity] = useState(1);
@@ -71,6 +71,10 @@ const ProductDetailPage = () => {
   }, [dispatch, id]);
 
   const handleAddToCart = () => {
+    if (user?.role === 'admin') {
+      toast.info('Admins cannot add items to cart. Cart is reserved for customer accounts.');
+      return;
+    }
     dispatch(addToCart({
       product: product._id,
       name: product.name,
@@ -85,6 +89,10 @@ const ProductDetailPage = () => {
   };
 
   const handleBuyNow = () => {
+    if (user?.role === 'admin') {
+      toast.info('Admins cannot purchase items. Please sign in as a Customer.');
+      return;
+    }
     handleAddToCart();
     setTimeout(() => navigate('/checkout'), 500);
   };
@@ -382,96 +390,115 @@ const ProductDetailPage = () => {
             </Typography>
 
             {/* Quantity & Actions */}
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
-                Quantity:
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', border: 1, borderColor: 'divider', borderRadius: 1 }}>
-                  <IconButton
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
-                    size="small"
-                  >
-                    <Remove />
-                  </IconButton>
-                  <Typography sx={{ px: 2, minWidth: 40, textAlign: 'center' }}>
-                    {quantity}
-                  </Typography>
-                  <IconButton
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                    disabled={quantity >= product.stock}
-                    size="small"
-                  >
-                    <Add />
-                  </IconButton>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Max {product.stock} items
+            {user?.role === 'admin' ? (
+              <Alert severity="info" sx={{ mb: 4, borderRadius: 2, border: '1px solid #bfdbfe' }}>
+                <Typography variant="subtitle2" fontWeight="bold">
+                  Administrator Mode
                 </Typography>
-              </Box>
-
-              {/* Action Buttons */}
-              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                  Purchasing and Cart operations are reserved for Customer accounts. As the Administrator, you manage inventory, pricing, and orders from the Admin Portal.
+                </Typography>
                 <Button
                   variant="contained"
-                  size="large"
-                  startIcon={<ShoppingCart />}
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                  sx={{
-                    flex: 1,
-                    py: 1.5,
-                    bgcolor: '#ff9f00',
-                    '&:hover': {
-                      bgcolor: '#e88900',
-                    },
-                  }}
+                  size="small"
+                  onClick={() => navigate('/admin/products')}
+                  sx={{ textTransform: 'none', fontWeight: 'bold' }}
                 >
-                  Add to Cart
+                  Manage Products in Admin Portal
                 </Button>
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleBuyNow}
-                  disabled={product.stock === 0}
-                  sx={{
-                    flex: 1,
-                    py: 1.5,
-                    bgcolor: '#fb641b',
-                    '&:hover': {
-                      bgcolor: '#e55a19',
-                    },
-                  }}
-                >
-                  Buy Now
-                </Button>
-              </Box>
+              </Alert>
+            ) : (
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                  Quantity:
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                    <IconButton
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={quantity <= 1}
+                      size="small"
+                    >
+                      <Remove />
+                    </IconButton>
+                    <Typography sx={{ px: 2, minWidth: 40, textAlign: 'center' }}>
+                      {quantity}
+                    </Typography>
+                    <IconButton
+                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                      disabled={quantity >= product.stock}
+                      size="small"
+                    >
+                      <Add />
+                    </IconButton>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Max {product.stock} items
+                  </Typography>
+                </Box>
 
-              {/* Secondary Actions */}
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={isInWishlist ? <Favorite /> : <FavoriteBorder />}
-                  onClick={handleWishlistToggle}
-                  sx={{
-                    flex: 1,
-                    color: isInWishlist ? 'error.main' : 'text.secondary',
-                    borderColor: isInWishlist ? 'error.main' : 'divider',
-                  }}
-                >
-                  {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Share />}
-                  onClick={handleShare}
-                  sx={{ flex: 1 }}
-                >
-                  Share
-                </Button>
+                {/* Action Buttons */}
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={<ShoppingCart />}
+                    onClick={handleAddToCart}
+                    disabled={product.stock === 0}
+                    sx={{
+                      flex: 1,
+                      py: 1.5,
+                      bgcolor: '#ff9f00',
+                      '&:hover': {
+                        bgcolor: '#e88900',
+                      },
+                    }}
+                  >
+                    Add to Cart
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleBuyNow}
+                    disabled={product.stock === 0}
+                    sx={{
+                      flex: 1,
+                      py: 1.5,
+                      bgcolor: '#fb641b',
+                      '&:hover': {
+                        bgcolor: '#e55a19',
+                      },
+                    }}
+                  >
+                    Buy Now
+                  </Button>
+                </Box>
+
+                {/* Secondary Actions */}
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={isInWishlist ? <Favorite /> : <FavoriteBorder />}
+                    onClick={handleWishlistToggle}
+                    sx={{
+                      flex: 1,
+                      color: isInWishlist ? 'error.main' : 'text.secondary',
+                      borderColor: isInWishlist ? 'error.main' : 'divider',
+                    }}
+                  >
+                    {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Share />}
+                    onClick={handleShare}
+                    sx={{ flex: 1 }}
+                  >
+                    Share
+                  </Button>
+                </Box>
               </Box>
-            </Box>
+            )}
 
             {/* Product Features */}
             {product.features && product.features.length > 0 && (

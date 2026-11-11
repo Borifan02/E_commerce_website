@@ -83,6 +83,14 @@ exports.updateUser = async (req, res, next) => {
       throw new NotFoundError('User');
     }
 
+    // Enforce single-admin policy: cannot promote another user to admin if one already exists
+    if (req.body.role === 'admin' && user.role !== 'admin') {
+      const adminExists = await User.findOne({ role: 'admin' });
+      if (adminExists && adminExists._id.toString() !== user._id.toString()) {
+        throw new BadRequestError(`Only one system administrator is allowed (${adminExists.email}). Additional administrators cannot be created.`);
+      }
+    }
+
     // Protect against removing last admin role
     if (req.body.role && req.body.role !== 'admin' && user.role === 'admin') {
       const adminCount = await User.countDocuments({ role: 'admin' });

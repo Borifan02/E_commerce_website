@@ -102,6 +102,30 @@ const CbePayment = ({ order, onSuccess }) => {
     }
   };
 
+  const handleSimulateMockPayment = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg('');
+      const mockTx = `CBE-MOCK-${Math.floor(100000 + Math.random() * 900000)}`;
+      setTransactionId(mockTx);
+      const res = await api.post('/api/payment/cbe/verify', {
+        orderId: order._id,
+        transactionId: mockTx,
+      });
+
+      if (res.data?.success) {
+        toast.success('⚡ Mock CBE deposit verified successfully!');
+        if (onSuccess) {
+          onSuccess(res.data.order);
+        }
+      }
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || 'Mock payment simulation failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
@@ -255,6 +279,19 @@ const CbePayment = ({ order, onSuccess }) => {
               size="medium"
             />
           </Box>
+
+          <Button
+            type="button"
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            size="medium"
+            disabled={submitting}
+            onClick={handleSimulateMockPayment}
+            sx={{ mb: 2, fontWeight: 'bold', borderStyle: 'dashed', borderWidth: 2 }}
+          >
+            ⚡ Instant Test / Mock Pay (Simulate CBE Deposit)
+          </Button>
 
           <Button
             type="submit"

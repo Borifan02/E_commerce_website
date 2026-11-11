@@ -309,65 +309,94 @@ const Navbar = () => {
             </Typography>
           </Box>
 
-          {/* Returns & Orders */}
-          <Box
-            onClick={() => navigate(isAuthenticated ? '/orders' : '/login')}
-            sx={{
-              cursor: 'pointer',
-              display: { xs: 'none', md: 'flex' },
-              flexDirection: 'column',
-              mx: 1,
-              p: 1,
-              border: '1px solid transparent',
-              '&:hover': { border: '1px solid white', borderRadius: 1 }
-            }}
-          >
-            <Typography variant="body2" sx={{ fontSize: '12px' }}>Returns</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>& Orders</Typography>
-          </Box>
+          {/* Right Role-Based Actions: Admin vs Customer */}
+          {user?.role === 'admin' ? (
+            <Box
+              onClick={() => navigate('/admin')}
+              sx={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.8,
+                bgcolor: '#f59e0b',
+                color: '#0f172a',
+                px: 1.8,
+                py: 0.7,
+                borderRadius: 2,
+                fontWeight: 'bold',
+                boxShadow: 2,
+                transition: 'all 0.2s',
+                '&:hover': { bgcolor: '#fbbf24', transform: 'scale(1.03)' },
+              }}
+            >
+              <AdminPanelSettings sx={{ fontSize: 20 }} />
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                Admin Portal
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              {/* Returns & Orders */}
+              <Box
+                onClick={() => navigate(isAuthenticated ? '/orders' : '/login')}
+                sx={{
+                  cursor: 'pointer',
+                  display: { xs: 'none', md: 'flex' },
+                  flexDirection: 'column',
+                  mx: 1,
+                  p: 1,
+                  border: '1px solid transparent',
+                  '&:hover': { border: '1px solid white', borderRadius: 1 }
+                }}
+              >
+                <Typography variant="body2" sx={{ fontSize: '12px' }}>Returns</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>& Orders</Typography>
+              </Box>
 
-          {/* Wishlist */}
-          <Box
-            onClick={() => navigate(isAuthenticated ? '/wishlist' : '/login')}
-            sx={{
-              cursor: 'pointer',
-              display: { xs: 'none', sm: 'flex' },
-              alignItems: 'center',
-              p: 1,
-              border: '1px solid transparent',
-              '&:hover': { border: '1px solid white', borderRadius: 1 }
-            }}
-          >
-            <Badge badgeContent={wishlistItems.length} color="error" sx={{ mr: 0.5 }}>
-              <Favorite sx={{ fontSize: 24, color: '#febd69' }} />
-            </Badge>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>
-              Wishlist
-            </Typography>
-          </Box>
+              {/* Wishlist */}
+              <Box
+                onClick={() => navigate(isAuthenticated ? '/wishlist' : '/login')}
+                sx={{
+                  cursor: 'pointer',
+                  display: { xs: 'none', sm: 'flex' },
+                  alignItems: 'center',
+                  p: 1,
+                  border: '1px solid transparent',
+                  '&:hover': { border: '1px solid white', borderRadius: 1 }
+                }}
+              >
+                <Badge badgeContent={wishlistItems.length} color="error" sx={{ mr: 0.5 }}>
+                  <Favorite sx={{ fontSize: 24, color: '#febd69' }} />
+                </Badge>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>
+                  Wishlist
+                </Typography>
+              </Box>
 
-          {/* Cart */}
-          <Box
-            onClick={() => navigate('/cart')}
-            sx={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'flex-end',
-              p: 1,
-              border: '1px solid transparent',
-              '&:hover': { border: '1px solid white', borderRadius: 1 }
-            }}
-          >
-            <Badge badgeContent={cartItemsCount} color="secondary" sx={{ '& .MuiBadge-badge': { right: 2, top: 2 } }}>
-              <ShoppingCart sx={{ fontSize: 32 }} />
-            </Badge>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', ml: 0.5, mb: 0.5, display: { xs: 'none', md: 'block' } }}>
-              Cart
-            </Typography>
-          </Box>
+              {/* Cart */}
+              <Box
+                onClick={() => navigate('/cart')}
+                sx={{
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  p: 1,
+                  border: '1px solid transparent',
+                  '&:hover': { border: '1px solid white', borderRadius: 1 }
+                }}
+              >
+                <Badge badgeContent={cartItemsCount} color="secondary" sx={{ '& .MuiBadge-badge': { right: 2, top: 2 } }}>
+                  <ShoppingCart sx={{ fontSize: 32 }} />
+                </Badge>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', ml: 0.5, mb: 0.5, display: { xs: 'none', md: 'block' } }}>
+                  Cart
+                </Typography>
+              </Box>
+            </>
+          )}
         </Box>
 
-        {/* User Menu Dropdown (Keep existing logic) */}
+        {/* User Menu Dropdown (Role-Based Segregation) */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -375,21 +404,16 @@ const Navbar = () => {
           onClick={handleMenuClose}
           sx={{ mt: 1 }}
         >
-          <MenuItem onClick={() => navigate('/profile')}>
-            <AccountCircle sx={{ mr: 1 }} />
-            Profile
-          </MenuItem>
-          <MenuItem onClick={() => navigate('/orders')}>
-            <ShoppingCart sx={{ mr: 1 }} />
-            Orders
-          </MenuItem>
-          <MenuItem onClick={() => navigate('/wishlist')}>
-            <Favorite sx={{ mr: 1, color: 'error.main' }} />
-            Wishlist ({wishlistItems.length})
-          </MenuItem>
-          {user?.role === 'admin' && (
+          {user?.role === 'admin' ? (
             <Box>
-              <Divider sx={{ my: 1 }} />
+              <Box sx={{ px: 2, py: 1, bgcolor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 'bold', display: 'block' }}>
+                  ROLE: SYSTEM ADMINISTRATOR
+                </Typography>
+                <Typography variant="body2" fontWeight="bold">
+                  {user.email}
+                </Typography>
+              </Box>
               <MenuItem onClick={() => navigate('/admin')}>
                 <AdminPanelSettings sx={{ mr: 1, color: 'primary.main' }} />
                 Admin Dashboard
@@ -402,9 +426,28 @@ const Navbar = () => {
                 <ReceiptLong sx={{ mr: 1 }} />
                 Manage Orders
               </MenuItem>
-              <Divider sx={{ my: 1 }} />
+              <MenuItem onClick={() => navigate('/profile')}>
+                <AccountCircle sx={{ mr: 1 }} />
+                Profile Settings
+              </MenuItem>
+            </Box>
+          ) : (
+            <Box>
+              <MenuItem onClick={() => navigate('/profile')}>
+                <AccountCircle sx={{ mr: 1 }} />
+                Profile
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/orders')}>
+                <ShoppingCart sx={{ mr: 1 }} />
+                My Orders
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/wishlist')}>
+                <Favorite sx={{ mr: 1, color: 'error.main' }} />
+                Wishlist ({wishlistItems.length})
+              </MenuItem>
             </Box>
           )}
+          <Divider sx={{ my: 1 }} />
           <MenuItem onClick={handleLogout}>
             Logout
           </MenuItem>

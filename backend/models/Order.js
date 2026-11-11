@@ -45,15 +45,15 @@ const orderSchema = new mongoose.Schema({
     },
     state: {
       type: String,
-      required: true
+      default: 'Addis Ababa'
     },
     zipCode: {
       type: String,
-      required: true
+      default: '1000'
     },
     country: {
       type: String,
-      required: true
+      default: 'Ethiopia'
     },
     phone: {
       type: String,
@@ -133,7 +133,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Calculate total price before saving
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   this.totalPrice = this.itemsPrice + this.taxPrice + this.shippingPrice;
   next();
 });
