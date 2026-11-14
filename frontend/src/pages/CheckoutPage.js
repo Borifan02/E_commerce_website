@@ -26,6 +26,10 @@ import {
   Radio,
   Chip,
   InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   CreditCard,
@@ -239,6 +243,8 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [confirmedOrder, setConfirmedOrder] = useState(null);
 
   const [addressForm, setAddressForm] = useState({
     name: shippingAddress.name || '',
@@ -360,9 +366,10 @@ const CheckoutPage = () => {
 
   const handlePaymentSuccess = (completedOrder) => {
     dispatch(clearCart());
-    const finalId = completedOrder?._id || currentOrder?._id;
+    const finalOrder = completedOrder || currentOrder;
+    setConfirmedOrder(finalOrder);
+    setSuccessDialogOpen(true);
     toast.success('Payment verified! Your order is now being processed.');
-    navigate(finalId ? `/orders/${finalId}` : '/orders');
   };
 
   const shippingPrice = cartTotal > 100 ? 0 : 10;
@@ -854,6 +861,75 @@ const CheckoutPage = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Order Confirmed & Payment Verified Celebration Modal */}
+      <Dialog
+        open={successDialogOpen}
+        onClose={() => navigate(confirmedOrder?._id ? `/orders/${confirmedOrder._id}` : '/orders')}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle component="div" sx={{ textAlign: 'center', pt: 4, pb: 1 }}>
+          <CheckCircle sx={{ fontSize: 64, color: 'success.main', mb: 1 }} />
+          <Typography variant="h5" component="div" fontWeight="bold">
+            Payment Verified & Order Confirmed!
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center', px: 4 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Thank you for shopping with EthioMart. Your payment was successfully confirmed and your order is now being fulfilled.
+          </Typography>
+
+          <Paper variant="outlined" sx={{ p: 2.5, bgcolor: '#f8fafc', borderRadius: 2, mb: 3, textAlign: 'left' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">Order Reference:</Typography>
+              <Typography variant="subtitle2" fontWeight="bold">
+                #{confirmedOrder?._id ? confirmedOrder._id.slice(-8).toUpperCase() : 'CONFIRMED'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">Payment Method:</Typography>
+              <Chip
+                label={(confirmedOrder?.paymentMethod || paymentMethod).toUpperCase()}
+                color="success"
+                size="small"
+                sx={{ fontWeight: 'bold' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">Total Paid:</Typography>
+              <Typography variant="subtitle2" fontWeight="bold" color="primary">
+                ${(confirmedOrder?.totalPrice || totalPrice)?.toFixed(2)} ({formatPrice(confirmedOrder?.totalPrice || totalPrice, 'ETB')})
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant="body2" color="text.secondary">Estimated Delivery (Ethiopia):</Typography>
+              <Typography variant="subtitle2" fontWeight="bold" color="text.primary">
+                24 – 48 Hours
+              </Typography>
+            </Box>
+          </Paper>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0, justifyContent: 'center', gap: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={() => navigate(confirmedOrder?._id ? `/orders/${confirmedOrder._id}` : '/orders')}
+            sx={{ fontWeight: 'bold', px: 3 }}
+          >
+            Track Order Details
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => navigate('/products')}
+            sx={{ fontWeight: 'bold' }}
+          >
+            Continue Shopping
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

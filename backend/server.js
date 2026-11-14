@@ -133,6 +133,94 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Root endpoint: Serves welcoming HTML dashboard in browser or clean JSON to API clients
+app.get('/', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'connecting';
+  const acceptsHtml = req.accepts('html', 'json') === 'html';
+
+  if (!acceptsHtml) {
+    return res.json({
+      success: true,
+      service: 'EthioMart E-Commerce Platform REST API',
+      version: '1.0.0',
+      status: 'online',
+      environment: process.env.NODE_ENV || 'development',
+      database: dbStatus,
+      docs: '/api/docs',
+      health: '/api/health',
+      endpoints: {
+        auth: '/api/auth',
+        products: '/api/products',
+        orders: '/api/orders',
+        payment: '/api/payment',
+        users: '/api/users',
+        coupons: '/api/coupons',
+        analytics: '/api/analytics',
+      },
+      clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+    });
+  }
+
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>EthioMart API Server</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; max-width: 680px; width: 100%; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 24px; }
+        .title { font-size: 24px; font-weight: 700; color: #38bdf8; margin: 0; }
+        .badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 13px; font-weight: 600; }
+        .description { color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+        .btn { padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #0284c7; color: white; }
+        .btn-primary:hover { background: #0369a1; }
+        .btn-secondary { background: #334155; color: #f8fafc; }
+        .btn-secondary:hover { background: #475569; }
+        .endpoints { background: #0f172a; border-radius: 8px; padding: 16px; border: 1px solid #1e293b; }
+        .endpoint-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e293b; font-family: monospace; font-size: 13px; }
+        .endpoint-row:last-child { border-bottom: none; }
+        .method { color: #38bdf8; font-weight: 700; }
+        .path { color: #cbd5e1; }
+        .footer { margin-top: 24px; font-size: 12px; color: #64748b; text-align: center; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="header">
+          <h1 class="title">EthioMart API Server</h1>
+          <span class="badge">🟢 Online & Active</span>
+        </div>
+        <p class="description">
+          Welcome to the backend REST API for EthioMart E-Commerce Platform. Delivering enterprise e-commerce capabilities with Ethiopian local payment integrations (Telebirr & CBE) and global card processing.
+        </p>
+        <div class="btn-group">
+          <a href="/api/docs" class="btn btn-primary">📖 Swagger API Docs</a>
+          <a href="/api/health" class="btn btn-secondary">🩺 Health Check</a>
+          <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}" class="btn btn-secondary">🛒 Frontend Store</a>
+        </div>
+        <div class="endpoints">
+          <div style="font-weight: 600; color: #94a3b8; margin-bottom: 10px; font-size: 13px;">PRIMARY API ROUTES:</div>
+          <div class="endpoint-row"><span class="method">GET/POST</span> <span class="path">/api/products</span></div>
+          <div class="endpoint-row"><span class="method">GET/POST</span> <span class="path">/api/orders</span></div>
+          <div class="endpoint-row"><span class="method">POST</span> <span class="path">/api/payment/telebirr/initiate & verify</span></div>
+          <div class="endpoint-row"><span class="method">POST</span> <span class="path">/api/payment/cbe/initiate & verify</span></div>
+          <div class="endpoint-row"><span class="method">POST</span> <span class="path">/api/auth/login & register</span></div>
+          <div class="endpoint-row"><span class="method">GET</span> <span class="path">/api/coupons & /api/users</span></div>
+        </div>
+        <div class="footer">
+          EthioMart Backend Engine &bull; Environment: ${process.env.NODE_ENV || 'development'}
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));

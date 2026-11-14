@@ -9,7 +9,6 @@ import {
   Link,
   Alert,
   CircularProgress,
-  Chip,
 } from '@mui/material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -84,26 +83,6 @@ const LoginPage = () => {
                 {error}
               </Alert>
             )}
-
-            {/* Quick Single Admin Credentials Assistant */}
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, width: '100%', bgcolor: '#f8fafc', borderRadius: 2 }}>
-              <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#475569', display: 'block', mb: 1 }}>
-                🔑 Sole System Administrator Account (Click to Autofill):
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip
-                  label="System Admin (admin@ecommerce.com / admin123456)"
-                  size="small"
-                  color="primary"
-                  variant="filled"
-                  onClick={() => setFormData({ email: 'admin@ecommerce.com', password: 'admin123456' })}
-                  sx={{ cursor: 'pointer', fontWeight: 600 }}
-                />
-              </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontSize: '11px' }}>
-                Role-based access: Admin manages catalog and orders. Sign in as Customer to add to cart and purchase.
-              </Typography>
-            </Paper>
 
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
               <TextField

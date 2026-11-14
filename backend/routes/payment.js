@@ -19,4 +19,7 @@ router.post('/telebirr/verify', protect, paymentController.verifyTelebirr);
 router.post('/cbe/initiate', protect, paymentController.initiateCBE);
 router.post('/cbe/verify', protect, paymentController.verifyCBE);
 
+// Payment audit trail
+router.get('/order/:orderId', protect, paymentController.getPaymentByOrder);
+
 module.exports = router;

@@ -29,11 +29,13 @@ import {
   LocalShipping,
   Payment,
   CancelOutlined,
-  CheckCircleOutline,
+  Print,
+  VerifiedUser,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { fetchOrder } from '../store/slices/orderSlice';
+import { formatPrice } from '../utils/currency';
 
 const trackerSteps = ['Order Placed', 'Processing', 'Shipped', 'Delivered'];
 
@@ -42,10 +44,31 @@ const OrderDetailPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { order, loading, error } = useSelector((state) => state.orders);
+  const [advancing, setAdvancing] = React.useState(false);
 
   useEffect(() => {
     dispatch(fetchOrder(id));
   }, [dispatch, id]);
+
+  const handleAdvanceTracking = async () => {
+    try {
+      setAdvancing(true);
+      const token = localStorage.getItem('token');
+      const res = await axios.put(
+        `/api/orders/${order._id}/advance-status`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data?.success) {
+        toast.success(res.data.message || 'Tracking status advanced!');
+        dispatch(fetchOrder(id));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update tracking');
+    } finally {
+      setAdvancing(false);
+    }
+  };
 
   const getStatusStepIndex = (status) => {
     switch (status) {
@@ -137,7 +160,7 @@ const OrderDetailPage = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Button
             startIcon={<ArrowBack />}
@@ -150,16 +173,25 @@ const OrderDetailPage = () => {
             Order #{order._id.slice(-8).toUpperCase()}
           </Typography>
         </Box>
-        {order.status === 'pending' && (
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"
-            color="error"
-            startIcon={<CancelOutlined />}
-            onClick={handleCancelOrder}
+            startIcon={<Print />}
+            onClick={() => window.print()}
           >
-            Cancel Order
+            Print Invoice
           </Button>
-        )}
+          {order.status === 'pending' && (
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<CancelOutlined />}
+              onClick={handleCancelOrder}
+            >
+              Cancel Order
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {/* Visual Tracking Stepper */}
@@ -180,6 +212,41 @@ const OrderDetailPage = () => {
                 </Step>
               ))}
             </Stepper>
+
+            {/* Tracking Progression Controls */}
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, bgcolor: '#f8fafc', p: 2, borderRadius: 2 }}>
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold">
+                  Status: <span style={{ color: '#0284c7' }}>{order.status.toUpperCase()}</span>
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {order.status === 'pending' && 'Awaiting payment confirmation.'}
+                  {order.status === 'processing' && 'Payment verified. Items being packaged in Addis Ababa distribution hub.'}
+                  {order.status === 'shipped' && 'In transit with courier. Expected delivery within 24–48 hours.'}
+                  {order.status === 'delivered' && 'Package delivered to recipient. Thank you for shopping with EthioMart!'}
+                </Typography>
+              </Box>
+              {order.status !== 'delivered' && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={advancing}
+                  onClick={handleAdvanceTracking}
+                  startIcon={<LocalShipping />}
+                  sx={{ fontWeight: 'bold' }}
+                >
+                  {advancing ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : order.status === 'pending' ? (
+                    '⚡ Advance to Processing'
+                  ) : order.status === 'processing' ? (
+                    '🚚 Dispatch Courier (Mark as Shipped)'
+                  ) : (
+                    '📦 Confirm Delivery (Delivered)'
+                  )}
+                </Button>
+              )}
+            </Box>
           </Box>
         )}
       </Paper>
@@ -336,31 +403,68 @@ const OrderDetailPage = () => {
 
               <Divider sx={{ my: 2 }} />
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" fontWeight="bold">Total Paid</Typography>
-                <Typography variant="h6" color="primary" fontWeight="bold">
-                  ${order.totalPrice?.toFixed(2)}
-                </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 1 }}>
+                <Typography variant="h6" fontWeight="bold">Total Amount</Typography>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="h6" color="primary" fontWeight="bold">
+                    ${order.totalPrice?.toFixed(2)}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#0284c7', fontWeight: 'bold', display: 'block' }}>
+                    ≈ {formatPrice(order.totalPrice, 'ETB')}
+                  </Typography>
+                </Box>
               </Box>
 
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2, mt: 2 }}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Payment Method
+                  Payment Channel & Verification
                 </Typography>
-                <Chip
-                  icon={<Payment />}
-                  label={order.paymentMethod?.toUpperCase()}
-                  color={order.isPaid ? 'success' : 'warning'}
-                  size="small"
-                />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip
+                    icon={<Payment />}
+                    label={order.paymentMethod?.toUpperCase()}
+                    color={order.isPaid ? 'success' : 'warning'}
+                    size="small"
+                    sx={{ fontWeight: 'bold' }}
+                  />
+                  {order.isPaid && (
+                    <Chip
+                      icon={<VerifiedUser sx={{ fontSize: '14px !important' }} />}
+                      label="Verified & Completed"
+                      color="success"
+                      variant="outlined"
+                      size="small"
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                  )}
+                </Box>
               </Box>
 
-              {order.isPaid && (
-                <Box sx={{ display: 'flex', alignItems: 'center', color: 'success.main', mt: 1 }}>
-                  <CheckCircleOutline sx={{ mr: 0.5, fontSize: 18 }} />
-                  <Typography variant="caption">Payment verified</Typography>
+              {order.isPaid && order.paymentResult?.id && (
+                <Box sx={{ p: 2, bgcolor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 2, mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    Transaction Reference:
+                  </Typography>
+                  <Typography variant="subtitle2" fontFamily="monospace" fontWeight="bold" sx={{ color: '#166534' }}>
+                    {order.paymentResult.id}
+                  </Typography>
+                  {order.paymentResult.provider && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                      Provider: {order.paymentResult.provider}
+                    </Typography>
+                  )}
                 </Box>
               )}
+
+              <Box sx={{ p: 1.5, bgcolor: '#f8fafc', borderRadius: 2 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 'bold' }}>
+                  🇪🇹 Ethiopian Doorstep Fulfillment:
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Addis Ababa dispatch: 24–48 hours.<br />
+                  Regional city courier: 2–4 business days.
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
         </Grid>

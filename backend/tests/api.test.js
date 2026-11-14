@@ -50,6 +50,24 @@ test('API Endpoints - Integration Sanity Tests', async (t) => {
     assert.strictEqual(data.success, false);
   });
 
+  await t.test('POST /api/payment/telebirr/verify rejects unauthenticated requests', async () => {
+    const res = await fetch(`${baseUrl}/api/payment/telebirr/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: 'test123', transactionId: 'TLB123', pin: '1234' }),
+    });
+    assert.strictEqual(res.status, 401);
+  });
+
+  await t.test('POST /api/payment/cbe/verify rejects unauthenticated requests', async () => {
+    const res = await fetch(`${baseUrl}/api/payment/cbe/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: 'test123', transactionId: 'FT123', pin: '1234' }),
+    });
+    assert.strictEqual(res.status, 401);
+  });
+
   await t.test('Teardown test server', () => {
     return new Promise((resolve) => {
       server.close(resolve);

@@ -441,6 +441,10 @@ exports.updateOrderStatus = async (req, res, next) => {
       order.deliveredAt = Date.now();
     }
 
+    if (req.body.status === CONSTANTS.ORDER_STATUS.SHIPPED && !order.trackingNumber) {
+      order.trackingNumber = req.body.trackingNumber || `EMS-ET-${Math.floor(100000 + Math.random() * 900000)}`;
+    }
+
     if (req.body.trackingNumber) {
       order.trackingNumber = req.body.trackingNumber;
     }
@@ -461,6 +465,55 @@ exports.updateOrderStatus = async (req, res, next) => {
       return next(error);
     }
     next(new AppError('Failed to update order status', 500));
+  }
+};
+
+// @desc    Advance order tracking step (Admin or Owner test dispatch)
+// @route   PUT /api/orders/:id/advance-status
+// @access  Private
+exports.advanceOrderTracking = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      throw new NotFoundError('Order');
+    }
+
+    const isOwner = order.user.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    if (!isAdmin && !isOwner) {
+      throw new ForbiddenError('Not authorized to update this order');
+    }
+
+    if (order.status === 'cancelled') {
+      throw new BadRequestError('Cannot advance a cancelled order');
+    }
+
+    if (order.status === 'pending') {
+      order.status = 'processing';
+      order.isPaid = true;
+      if (!order.paidAt) order.paidAt = Date.now();
+    } else if (order.status === 'processing') {
+      order.status = 'shipped';
+      if (!order.trackingNumber) {
+        order.trackingNumber = `EMS-ET-${Math.floor(100000 + Math.random() * 900000)}`;
+      }
+    } else if (order.status === 'shipped') {
+      order.status = 'delivered';
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+    }
+
+    const updatedOrder = await order.save();
+    logger.info(`Order ${order._id} tracking advanced to: ${order.status}`);
+    res.json({
+      success: true,
+      message: `Order status advanced to ${order.status.toUpperCase()}`,
+      order: updatedOrder,
+    });
+  } catch (error) {
+    logger.error('Advance order tracking error:', error);
+    if (error instanceof AppError) return next(error);
+    next(new AppError('Failed to advance order tracking', 500));
   }
 };
 

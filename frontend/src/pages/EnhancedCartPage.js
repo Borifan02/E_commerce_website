@@ -409,7 +409,7 @@ const EnhancedCartPage = () => {
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body1">Shipping</Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="body1" component="div" sx={{ fontWeight: 'bold' }}>
                   {shipping === 0 ? (
                     <Chip label="FREE" size="small" color="success" />
                   ) : (

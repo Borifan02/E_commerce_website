@@ -1,331 +1,649 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    Container,
-    Typography,
-    Box,
-    Paper,
-    Grid,
-    Card,
-    CardContent,
-    Button,
-    TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Grid,
+  Card,
+  CardContent,
+  Button,
+  TextField,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Chip,
+  Alert,
+  MenuItem,
 } from '@mui/material';
 import {
-    ExpandMore,
-    CheckCircle,
-    LocalShipping,
-    Security,
-    CardGiftcard,
-    Storefront,
-    Email,
-    Phone
+  ExpandMore,
+  CheckCircle,
+  LocalShipping,
+  CardGiftcard,
+  Storefront,
+  VerifiedUser,
+  AssignmentReturn,
+  Lock,
 } from '@mui/icons-material';
+import { toast } from 'react-toastify';
 
 const InfoPage = ({ title }) => {
-    // --- Content Generators ---
 
-    const renderDeals = () => (
-        <Grid container spacing={3}>
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item}>
-                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', '&:hover': { boxShadow: 6, transform: 'scale(1.02)', transition: '0.2s' } }}>
-                        <Box sx={{ height: 140, bgcolor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography variant="h3" color="text.secondary">Usually Image</Typography>
-                        </Box>
-                        <CardContent sx={{ flexGrow: 1 }}>
-                            <Typography gutterBottom variant="h5" component="div" sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
-                                {50 - item * 5}% OFF
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Amazing Deal on Product #{item}. Limited time offer!
-                            </Typography>
-                            <Button variant="contained" size="small" sx={{ mt: 2 }} fullWidth color="warning">
-                                Shop Now
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
-        </Grid>
-    );
+  // Seller application form state
+  const [sellerForm, setSellerForm] = useState({
+    businessName: '',
+    category: 'Electronics',
+    phone: '',
+    tinNumber: '',
+    city: 'Addis Ababa',
+  });
+  const [sellerSubmitted, setSellerSubmitted] = useState(false);
 
-    const renderFAQ = () => (
+  // Gift card checker state
+  const [giftCode, setGiftCode] = useState('');
+  const [giftResult, setGiftResult] = useState(null);
+
+  // Return request form state
+  const [returnOrderRef, setReturnOrderRef] = useState('');
+  const [returnReason, setReturnReason] = useState('defective');
+  const [returnSubmitted, setReturnSubmitted] = useState(false);
+
+  const handleSellerSubmit = (e) => {
+    e.preventDefault();
+    if (!sellerForm.businessName.trim() || !sellerForm.phone.trim()) {
+      toast.error('Please fill in your Business Name and Contact Phone');
+      return;
+    }
+    setSellerSubmitted(true);
+    toast.success('Seller application received! Our merchant onboarding team will contact you within 24 hours.');
+  };
+
+  const handleCheckGiftCard = (e) => {
+    e.preventDefault();
+    if (!giftCode.trim()) {
+      toast.error('Please enter a voucher code');
+      return;
+    }
+    const clean = giftCode.trim().toUpperCase();
+    if (clean === 'WELCOME10' || clean === 'ETHIO2026' || clean.startsWith('GIFT')) {
+      setGiftResult({ valid: true, balance: '500 ETB ($4.17 USD)', status: 'Active & Redeemable' });
+    } else {
+      setGiftResult({ valid: false, balance: '0 ETB', status: 'Code expired or invalid' });
+    }
+  };
+
+  const handleReturnSubmit = (e) => {
+    e.preventDefault();
+    if (!returnOrderRef.trim()) {
+      toast.error('Please enter your Order Reference or ID');
+      return;
+    }
+    setReturnSubmitted(true);
+    toast.success('Return inspection ticket initiated! Our Addis Ababa courier will arrange pickup.');
+  };
+
+  // --- Content Renderers ---
+
+  const renderShippingInfo = () => (
     <Box>
-        <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-            Frequently Asked Questions
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <LocalShipping sx={{ fontSize: 44, mr: 2, color: 'primary.main' }} />
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            Ethiopia Nationwide Delivery & Fulfillment
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Fast, insured, and tracked shipping across Addis Ababa and all regional cities.
+          </Typography>
+        </Box>
+      </Box>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%', borderRadius: 3, border: '1px solid #e2e8f0', p: 1 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Chip label="Addis Ababa Express" color="primary" sx={{ fontWeight: 'bold' }} />
+                <Typography variant="caption" color="text.secondary">Doorstep Dispatch</Typography>
+              </Box>
+              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                Same-Day & 24–48h Delivery
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                Covers all sub-cities: Bole, Kirkos, Yeka, Nifas Silk, Arada, Gullele, Lideta, Akaki Kality, Kolfe Keranio, and Addis Ketema.
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><CheckCircle color="success" fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Free Delivery on orders over $100 (≈ 12,000 ETB)" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckCircle color="success" fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Flat standard shipping: $5 (≈ 600 ETB) for orders below $100" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckCircle color="success" fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="SMS & phone call notifications prior to arrival" />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%', borderRadius: 3, border: '1px solid #e2e8f0', p: 1 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Chip label="Regional Ethiopia" color="secondary" sx={{ fontWeight: 'bold' }} />
+                <Typography variant="caption" color="text.secondary">Regional Courier Hubs</Typography>
+              </Box>
+              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                2–4 Business Days
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                Direct parcel delivery to major hubs including Hawassa, Adama (Nazret), Bahir Dar, Dire Dawa, Gondar, Mekelle, Jimma, and Bishoftu.
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon><CheckCircle color="success" fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Insured transit with Ethio Postal Service (EMS) & regional partner buses" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckCircle color="success" fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Tracking code provided upon dispatch" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon><CheckCircle color="success" fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Local collection points available in each regional capital" />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Typography variant="h6" fontWeight="bold" gutterBottom>
+        Frequently Asked Shipping Questions
+      </Typography>
+      <Accordion sx={{ mb: 1, borderRadius: 2 }}>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="bold">How will I know when my parcel is on the way?</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography variant="body2" color="text.secondary">
+            You will receive a confirmation SMS and email when your order status updates to "Shipped". You can also view live tracking updates on your Order Tracking page.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+
+      <Accordion sx={{ mb: 1, borderRadius: 2 }}>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography fontWeight="bold">Can someone else receive my package if I am not home?</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography variant="body2" color="text.secondary">
+            Yes. A family member or designated representative can accept the delivery by presenting your order reference code and the delivery recipient's phone number.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+    </Box>
+  );
+
+  const renderReturns = () => (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <AssignmentReturn sx={{ fontSize: 44, mr: 2, color: 'primary.main' }} />
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            Hassle-Free Returns & Replacements
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Customer satisfaction guaranteed with our 7–14 day Ethiopian return policy.
+          </Typography>
+        </Box>
+      </Box>
+
+      <Alert severity="info" icon={<VerifiedUser />} sx={{ mb: 4, borderRadius: 2 }}>
+        <strong>100% Refund Guarantee:</strong> If an item is damaged, defective, or does not match the product description, you are entitled to a full refund credited directly to your <strong>Telebirr wallet</strong> or <strong>CBE bank account</strong> within 24–48 hours of inspection.
+      </Alert>
+
+      {/* 4 Step Return Process */}
+      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }}>
+        How Returns Work
+      </Typography>
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {[
+          { step: '1', title: 'Submit Request', desc: 'Enter your order reference below or contact customer support.' },
+          { step: '2', title: 'Pickup or Drop-off', desc: 'Free courier pickup in Addis Ababa or drop-off at a regional hub.' },
+          { step: '3', title: 'Inspection', desc: 'Our technical team verifies item condition within 24 hours.' },
+          { step: '4', title: 'Instant Refund', desc: 'Funds refunded via Telebirr, CBE, or replacement dispatched.' },
+        ].map((item) => (
+          <Grid item xs={12} sm={6} md={3} key={item.step}>
+            <Paper sx={{ p: 2.5, borderRadius: 2, border: '1px solid #e2e8f0', height: '100%' }}>
+              <Box sx={{ width: 32, height: 32, borderRadius: '50%', bgcolor: 'primary.main', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', mb: 1.5 }}>
+                {item.step}
+              </Box>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                {item.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {item.desc}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Interactive Return Request Box */}
+      <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#f8fafc', mb: 4 }}>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          Submit an Online Return Request
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Have an order you would like to return or exchange? Enter your order details below.
         </Typography>
 
-        {[
-            {
-                question: "How do I track my order?",
-                answer:
-                    "Once your order is shipped, you will receive a confirmation email with a tracking link. You can click the link to view real-time updates on your delivery status."
-            },
-            {
-                question: "What is the return policy?",
-                answer:
-                    "You can return items within 7–14 days of delivery as long as the product is unused and in its original packaging. Contact our support team to start a return request."
-            },
-            {
-                question: "Do you ship internationally?",
-                answer:
-                    "Yes, we offer international shipping to most countries. Shipping fees and delivery times may vary based on your location."
-            },
-            {
-                question: "How can I change my payment method?",
-                answer:
-                    "You can update your payment method during checkout. If your order is already placed, please contact our support team to make changes before your order is processed."
-            }
-        ].map((item, i) => (
-            <Accordion key={i}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography fontWeight="medium">{item.question}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Typography color="text.secondary">
-                        {item.answer}
-                    </Typography>
-                </AccordionDetails>
-            </Accordion>
-        ))}
+        {returnSubmitted ? (
+          <Alert severity="success" sx={{ borderRadius: 2 }}>
+            <strong>Return Request Received:</strong> Your return inquiry for order #{returnOrderRef} has been logged. Our Addis Ababa customer service rep will call you at your registered phone number today.
+          </Alert>
+        ) : (
+          <Box component="form" onSubmit={handleReturnSubmit}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Order Reference / ID"
+                  placeholder="e.g. 64a1b2c3d4e5... or last 8 digits"
+                  value={returnOrderRef}
+                  onChange={(e) => setReturnOrderRef(e.target.value)}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="Return Reason"
+                  value={returnReason}
+                  onChange={(e) => setReturnReason(e.target.value)}
+                >
+                  <MenuItem value="defective">Defective or Damaged</MenuItem>
+                  <MenuItem value="wrong_item">Received Wrong Item</MenuItem>
+                  <MenuItem value="size_fit">Size or Fit Issue</MenuItem>
+                  <MenuItem value="changed_mind">No Longer Needed</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <Button fullWidth variant="contained" type="submit" sx={{ fontWeight: 'bold' }}>
+                  Request
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+      </Paper>
     </Box>
-);
+  );
 
-
-    const renderContactForm = () => (
-        <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom>Get in Touch</Typography>
-                <Typography paragraph>
-                    We'd love to hear from you. Please fill out this form and we will get in touch with you shortly.
-                </Typography>
-                <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
-                    <TextField fullWidth label="Name" margin="normal" variant="outlined" />
-                    <TextField fullWidth label="Email" margin="normal" variant="outlined" />
-                    <TextField fullWidth label="Subject" margin="normal" variant="outlined" />
-                    <TextField fullWidth label="Message" margin="normal" multiline rows={4} variant="outlined" />
-                    <Button variant="contained" size="large" sx={{ mt: 3 }}>
-                        Send Message
-                    </Button>
-                </Box>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <Box sx={{ bgcolor: '#f5f5f5', p: 3, borderRadius: 2, height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>Contact Information</Typography>
-                    <List>
-                        <ListItem>
-                            <ListItemIcon><LocationOn /></ListItemIcon>
-                            <ListItemText primary="Address" secondary="123 Commerce St, Seattle, WA 98109" />
-                        </ListItem>
-                        <ListItem>
-                            <ListItemIcon><Phone /></ListItemIcon>
-                            <ListItemText primary="Phone" secondary="+1 (206) 555-0123" />
-                        </ListItem>
-                        <ListItem>
-                            <ListItemIcon><Email /></ListItemIcon>
-                            <ListItemText primary="Email" secondary="support@ethiomart.et" />
-                        </ListItem>
-                    </List>
-                </Box>
-            </Grid>
-        </Grid>
-    );
-
-    const renderRegistry = () => (
-        <Box textAlign="center" py={5}>
-            <CardGiftcard sx={{ fontSize: 80, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h4" gutterBottom>Celebrate with EthioMart Gift Registry</Typography>
-            <Typography paragraph color="text.secondary" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
-                Whether you're planning a wedding, a graduation, or a holiday celebration, our registry makes it easy for your friends and family to find the perfect gift.
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                <Button variant="contained" size="large">Create a Registry</Button>
-                <Button variant="outlined" size="large">Find a Registry</Button>
-            </Box>
+  const renderPrivacy = () => (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Lock sx={{ fontSize: 44, mr: 2, color: 'primary.main' }} />
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            Customer Privacy & Data Protection Policy
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Last updated: 2026 &bull; Compliant with Ethiopian Digital Commerce & Data Confidentiality Standards
+          </Typography>
         </Box>
-    );
+      </Box>
 
-    const LocationOn = () => <Box component="span" pr={1}>📍</Box>; // Simple icon fallback if import fails
+      <Typography paragraph sx={{ lineHeight: 1.8 }}>
+        At <strong>EthioMart</strong>, your privacy and trust are of paramount importance. This document details how we collect, safeguard, and use your personal and payment details when you browse our website or make purchases.
+      </Typography>
 
-    // --- Content Switcher ---
+      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
+        1. Information We Collect
+      </Typography>
+      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+        We collect only the essential details necessary to fulfill your orders and deliver exceptional customer service:
+        <br />&bull; <strong>Identity & Contact:</strong> Full name, delivery street address, city, and phone number for courier coordination.
+        <br />&bull; <strong>Authentication:</strong> Securely salted and hashed password using modern bcrypt encryption algorithms. We never store plain-text passwords.
+        <br />&bull; <strong>Order Records:</strong> Items purchased, shipping timestamps, and transaction references.
+      </Typography>
 
-    const getContent = () => {
-        switch (title) {
-            case "Today's Deals":
-                return renderDeals();
-            case "Customer Service":
-            case "Help Center":
-                return (
-                    <Box>
-                        <Typography paragraph>
-                            Hello, how can we help you today? Browse our help topics below or contact us directly.
-                        </Typography>
-                        <Grid container spacing={2} sx={{ mb: 4 }}>
-                            {['Your Orders', 'Returns & Refunds', 'Digital Services', 'Payment (Telebirr & CBE)', 'Payment Settings', 'Account Security'].map((item) => (
-                                <Grid item xs={12} sm={4} key={item}>
-                                    <Paper variant="outlined" sx={{ p: 2, cursor: 'pointer', '&:hover': { bgcolor: '#f9f9f9', borderColor: 'primary.main' } }}>
-                                        <Typography variant="subtitle1" fontWeight="bold">{item}</Typography>
-                                    </Paper>
-                                </Grid>
-                            ))}
-                        </Grid>
-                        {renderFAQ()}
-                    </Box>
-                );
-            case "Registry":
-                return renderRegistry();
-            case "Gift Cards":
-                return (
-                    <Box>
-                        <Typography paragraph>Shop for digital vouchers and gift cards for every occasion.</Typography>
-                        <Grid container spacing={3}>
-                            {[1, 2, 3].map(i => (
-                                <Grid item xs={12} sm={4} key={i}>
-                                    <Card sx={{ bgcolor: i === 1 ? '#0088cc' : i === 2 ? '#6b21a8' : '#1e293b', color: 'white', height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>
-                                        <Typography variant="h5">EthioMart Voucher</Typography>
-                                    </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
-                        <Box mt={4}>
-                            <Button variant="contained">Redeem Voucher</Button>
-                        </Box>
-                    </Box>
-                );
-            case "Sell on EthioMart":
-                return (
-                    <Box textAlign="center">
-                        <Storefront sx={{ fontSize: 60, color: 'secondary.main', mb: 2 }} />
-                        <Typography variant="h4" gutterBottom>Become an EthioMart Verified Seller</Typography>
-                        <Typography paragraph>Reach customers across Addis Ababa and all regional cities in Ethiopia.</Typography>
-                        <Grid container spacing={2} justifyContent="center" sx={{ my: 4 }}>
-                            {['Zero Listing Fees', 'Telebirr & CBE Payouts', 'Nationwide Reach', '24/7 Merchant Support'].map(feat => (
-                                <Grid item xs={6} sm={3} key={feat}>
-                                    <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
-                                        <CheckCircle color="success" sx={{ mb: 1 }} />
-                                        <Typography variant="subtitle2">{feat}</Typography>
-                                    </Box>
-                                </Grid>
-                            ))}
-                        </Grid>
-                        <Button variant="contained" size="large" color="primary">Apply to Sell on EthioMart</Button>
-                    </Box>
-                );
-            case "Contact Us":
-                return renderContactForm();
-            case "Shipping Information":
-                return (
-                    <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                            <LocalShipping sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-                            <Typography variant="h5">Fast & Reliable Shipping</Typography>
-                        </Box>
-                        <Typography paragraph>We offer a variety of shipping options to meet your needs.</Typography>
-                        <Paper variant="outlined">
-                            <Box p={2} sx={{ bgcolor: '#eee', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between' }}>
-                                <Box>Shipping Speed</Box><Box>Cost</Box>
-                            </Box>
-                            <List>
-                                <ListItem divider>
-                                    <ListItemText primary="Standard Shipping (4-5 business days)" />
-                                    <Typography>FREE on orders over $25</Typography>
-                                </ListItem>
-                                <ListItem divider>
-                                    <ListItemText primary="Two-Day Shipping" />
-                                    <Typography>$9.99 (Free for Prime)</Typography>
-                                </ListItem>
-                                <ListItem>
-                                    <ListItemText primary="One-Day Shipping" />
-                                    <Typography>$14.99</Typography>
-                                </ListItem>
-                            </List>
-                        </Paper>
-                    </Box>
-                );
-            case "Privacy Policy":
-                return (
-                    <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <Security sx={{ mr: 1 }} />
-                            <Typography variant="h6">We value your privacy</Typography>
-                        </Box>
-                        <Typography paragraph>
-                            Last updated: December 11, 2025
-                        </Typography>
-                        <Typography paragraph>
-                            At EthioMart, we know that you care how information about you is used and shared, and we appreciate your trust that we will do so carefully and sensibly.
-                        </Typography>
-                        <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>Information We Collect</Typography>
-                        <Typography paragraph>
-                            We collect your personal information in order to provide and continually improve our products and services.
-                            Here are the types of personal information we collect...
-                        </Typography>
-                        <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>How We Use Your Information</Typography>
-                        <Typography paragraph>
-                            We use your personal information to operate, provide, develop, and improve the products and services that we offer our customers.
-                            These purposes include: Purchase and delivery of products and services, Recommendations and personalization, etc.
-                        </Typography>
-                    </Box>
-                );
-            case "Returns & Replacements":
-                return (
-                    <Box>
-                        <Typography variant="h5" gutterBottom>Returns Center</Typography>
-                        <Typography paragraph>
-                            Props to you for giving it a shot! If it didn't work out, you can return most items within 7–14 days of delivery.
-                        </Typography>
-                        <Button variant="contained" sx={{ mb: 4 }}>Start a Return</Button>
-                        {renderFAQ()}
-                    </Box>
-                );
-            default: // About Us, etc.
-                return (
-                    <Box>
-                        <Typography variant="h5" gutterBottom>About {title}</Typography>
-                        <Typography paragraph>
-                            EthioMart is Ethiopia’s premier digital e-commerce marketplace, connecting verified local merchants and international brands with customers across Addis Ababa and nationwide with seamless Telebirr and CBE payment integration.
-                        </Typography>
-                        <Typography paragraph>
-                            We strive to have the positive impact on customers, employees, small businesses, the economy, and local communities.
-                        </Typography>
-                        <Grid container spacing={2} sx={{ mt: 2 }}>
-                            <Grid item xs={12} md={6}>
-                                <Paper sx={{ p: 4, bgcolor: '#f5f5f5', height: '200px' }}>
-                                    <Typography variant="h6">Our Mission</Typography>
-                                    <Typography>To make modern digital commerce and rapid delivery accessible to everyone in Ethiopia.</Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <Paper sx={{ p: 4, bgcolor: '#f5f5f5', height: '200px' }}>
-                                    <Typography variant="h6">Our Vision</Typography>
-                                    <Typography>Building the future of e-commerce, today.</Typography>
-                                </Paper>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                );
-        }
-    };
+      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
+        2. Payment Security (Telebirr, CBE & Cards)
+      </Typography>
+      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+        Your financial security is guaranteed through isolated, certified payment gateways:
+        <br />&bull; <strong>Telebirr & CBE:</strong> We verify transactions strictly through official SMS reference numbers and merchant codes. We do not require or ask for your personal Telebirr PIN or CBE mobile banking login password.
+        <br />&bull; <strong>Credit/Debit Cards:</strong> Card details are tokenized and processed end-to-end via Stripe's PCI-DSS Level 1 compliant infrastructure with 256-bit SSL encryption. EthioMart servers never store full 16-digit card numbers or CVV codes.
+      </Typography>
 
-    return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Paper elevation={0} sx={{ p: 4, mb: 4, border: '1px solid #e0e0e0', minHeight: '60vh' }}>
-                <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 3, borderBottom: '3px solid #febd69', display: 'inline-block' }}>
-                    {title}
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                    {getContent()}
-                </Box>
+      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
+        3. Sharing of Information
+      </Typography>
+      <Typography variant="body2" color="text.secondary" paragraph sx={{ lineHeight: 1.8 }}>
+        We never sell, rent, or monetize customer data. Information is shared only with verified logistics drivers in Ethiopia strictly for delivering your parcel to your address.
+      </Typography>
+
+      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
+        4. Data Privacy Officer Contact
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+        If you have questions about your personal data or wish to delete your account, please reach our privacy team at <strong>dabasaborifan@gmail.com</strong> or call <strong>+251 965 844 287</strong> (Bole Road, Addis Ababa, Ethiopia).
+      </Typography>
+    </Box>
+  );
+
+  const renderSell = () => (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Storefront sx={{ fontSize: 44, mr: 2, color: 'primary.main' }} />
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            Sell on EthioMart & Grow Your Business
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Join Ethiopia's fastest-growing digital marketplace. Reach millions of customers in Addis Ababa and nationwide.
+          </Typography>
+        </Box>
+      </Box>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {[
+          { title: 'Zero Listing Fees', desc: 'List your catalog for free. Only pay a competitive commission when you make a sale.' },
+          { title: 'Local Payment Integration', desc: 'Get paid directly into your Telebirr merchant account or CBE bank account automatically.' },
+          { title: 'Nationwide Logistics', desc: 'Use our centralized Addis Ababa warehouse or let our drivers pickup directly from your shop.' },
+        ].map((item, idx) => (
+          <Grid item xs={12} md={4} key={idx}>
+            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', height: '100%' }}>
+              <Typography variant="h6" fontWeight="bold" color="primary" gutterBottom>
+                {item.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {item.desc}
+              </Typography>
             </Paper>
-        </Container>
-    );
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Seller Application Form */}
+      <Paper sx={{ p: 4, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#f8fafc' }}>
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Register as an EthioMart Merchant
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Submit your business details to receive your seller portal access and start listing products today.
+        </Typography>
+
+        {sellerSubmitted ? (
+          <Alert severity="success" sx={{ borderRadius: 2 }}>
+            <strong>Application Submitted!</strong> Thank you for applying to sell on EthioMart. Our merchant verification team in Addis Ababa will review your details and contact you at {sellerForm.phone} today.
+          </Alert>
+        ) : (
+          <Box component="form" onSubmit={handleSellerSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Store / Business Name"
+                  placeholder="e.g. Addis Tech Hub"
+                  value={sellerForm.businessName}
+                  onChange={(e) => setSellerForm({ ...sellerForm, businessName: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Primary Category"
+                  value={sellerForm.category}
+                  onChange={(e) => setSellerForm({ ...sellerForm, category: e.target.value })}
+                >
+                  <MenuItem value="Electronics">Electronics & Computers</MenuItem>
+                  <MenuItem value="Clothing">Fashion & Traditional Clothing</MenuItem>
+                  <MenuItem value="Home">Home & Kitchen Goods</MenuItem>
+                  <MenuItem value="Beauty">Beauty & Personal Care</MenuItem>
+                  <MenuItem value="Books">Books & Stationery</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Contact Phone"
+                  placeholder="e.g. 0911223344"
+                  value={sellerForm.phone}
+                  onChange={(e) => setSellerForm({ ...sellerForm, phone: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="TIN Number (Tax ID)"
+                  placeholder="e.g. 0012345678"
+                  value={sellerForm.tinNumber}
+                  onChange={(e) => setSellerForm({ ...sellerForm, tinNumber: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Operating City"
+                  placeholder="Addis Ababa"
+                  value={sellerForm.city}
+                  onChange={(e) => setSellerForm({ ...sellerForm, city: e.target.value })}
+                />
+              </Grid>
+            </Grid>
+
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              sx={{ mt: 3, px: 4, py: 1.5, fontWeight: 'bold', borderRadius: 2 }}
+            >
+              Submit Merchant Application
+            </Button>
+          </Box>
+        )}
+      </Paper>
+    </Box>
+  );
+
+  const renderGiftCards = () => (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <CardGiftcard sx={{ fontSize: 44, mr: 2, color: 'primary.main' }} />
+        <Box>
+          <Typography variant="h5" fontWeight="bold">
+            EthioMart Digital Gift Cards & Vouchers
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            The ideal present for birthdays, holidays, graduations, and weddings across Ethiopia.
+          </Typography>
+        </Box>
+      </Box>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {[
+          { amount: '500 ETB', usd: '≈ $4.17 USD', code: 'ETHIO500', note: 'Perfect for books & accessories' },
+          { amount: '1,000 ETB', usd: '≈ $8.33 USD', code: 'ETHIO1000', note: 'Great for fashion & footwear' },
+          { amount: '2,500 ETB', usd: '≈ $20.83 USD', code: 'ETHIO2500', note: 'Best for electronics & gadgets' },
+        ].map((item, idx) => (
+          <Grid item xs={12} md={4} key={idx}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                color: 'white',
+                boxShadow: 2,
+              }}
+            >
+              <Typography variant="overline" sx={{ letterSpacing: 1.5, opacity: 0.8 }}>
+                ETHIOMART E-GIFT
+              </Typography>
+              <Typography variant="h4" fontWeight="bold" sx={{ my: 1 }}>
+                {item.amount}
+              </Typography>
+              <Typography variant="caption" sx={{ display: 'block', mb: 2, opacity: 0.9 }}>
+                {item.usd} &bull; {item.note}
+              </Typography>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ bgcolor: 'white', color: '#1e3a8a', fontWeight: 'bold', '&:hover': { bgcolor: '#f1f5f9' } }}
+                onClick={() => {
+                  navigator.clipboard.writeText(item.code);
+                  toast.success(`Coupon ${item.code} copied!`);
+                }}
+              >
+                Copy Sample Code ({item.code})
+              </Button>
+            </Paper>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Gift Card Balance Checker */}
+      <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#f8fafc' }}>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          Check Gift Card or Voucher Balance
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Enter a voucher code to verify its balance and redeemability.
+        </Typography>
+        <Box component="form" onSubmit={handleCheckGiftCard}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={8}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Gift Card or Voucher Code"
+                placeholder="e.g. WELCOME10, ETHIO2026, or GIFT-..."
+                value={giftCode}
+                onChange={(e) => setGiftCode(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Button fullWidth variant="contained" type="submit" sx={{ fontWeight: 'bold' }}>
+                Check Balance
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {giftResult && (
+          <Alert severity={giftResult.valid ? 'success' : 'warning'} sx={{ mt: 2, borderRadius: 2 }}>
+            <strong>Balance:</strong> {giftResult.balance} &bull; <strong>Status:</strong> {giftResult.status}
+          </Alert>
+        )}
+      </Paper>
+    </Box>
+  );
+
+  const renderAbout = () => (
+    <Box>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        About EthioMart
+      </Typography>
+      <Typography variant="subtitle1" color="primary" fontWeight="bold" gutterBottom>
+        Empowering Commerce across Ethiopia with Local Trust & Global Standards
+      </Typography>
+      <Typography paragraph sx={{ lineHeight: 1.8 }}>
+        Founded with the mission to accelerate Ethiopia's digital transformation, <strong>EthioMart</strong> bridges local merchants, verified artisans, and international brands directly with consumers across Addis Ababa and nationwide.
+      </Typography>
+      <Typography paragraph sx={{ lineHeight: 1.8 }}>
+        By pioneering frictionless local payment integrations—including <strong>Telebirr (*127#)</strong> and <strong>Commercial Bank of Ethiopia (CBE / *847#)</strong>—we eliminate payment barriers and deliver seamless online shopping directly to every smartphone and computer in Ethiopia.
+      </Typography>
+
+      <Grid container spacing={3} sx={{ my: 2 }}>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0', height: '100%' }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>Our Mission</Typography>
+            <Typography variant="body2" color="text.secondary">
+              To make modern, secure, and affordable digital shopping accessible to every individual and business throughout Ethiopia.
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0', height: '100%' }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>Payment Inclusion</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Instant checkout with Telebirr mobile money, CBE bank transfers, cash on delivery, and international credit cards.
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0', height: '100%' }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>Fast Logistics</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Doorstep delivery in Addis Ababa in 24–48 hours, and 2–4 day regional dispatch to all Ethiopian cities.
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ p: 3, bgcolor: '#eff6ff', borderRadius: 3, border: '1px solid #bfdbfe', mt: 3 }}>
+        <Typography variant="subtitle2" fontWeight="bold" color="primary">
+          Headquarters & Customer Operations
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Bole Sub-City, Addis Ababa, Ethiopia &bull; Hotline: +251 965 844 287 &bull; Email: dabasaborifan@gmail.com
+        </Typography>
+      </Box>
+    </Box>
+  );
+
+  const getContent = () => {
+    switch (title) {
+      case 'Shipping Information':
+        return renderShippingInfo();
+      case 'Returns & Replacements':
+      case 'Returns':
+        return renderReturns();
+      case 'Privacy Policy':
+        return renderPrivacy();
+      case 'Sell on EthioMart':
+      case 'Become a Seller':
+        return renderSell();
+      case 'Gift Cards':
+      case 'Registry':
+        return renderGiftCards();
+      default:
+        return renderAbout();
+    }
+  };
+
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper elevation={0} sx={{ p: { xs: 2.5, md: 4 }, mb: 4, border: '1px solid #e0e0e0', borderRadius: 3, minHeight: '60vh' }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: 'bold', mb: 3, borderBottom: '3px solid #0284c7', display: 'inline-block' }}
+        >
+          {title}
+        </Typography>
+        <Box sx={{ mt: 2 }}>{getContent()}</Box>
+      </Paper>
+    </Container>
+  );
 };
 
 export default InfoPage;

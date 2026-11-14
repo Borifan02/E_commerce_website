@@ -79,6 +79,11 @@ router.put('/:id/status', protect, authorize('admin'), [
 // @access  Private/Admin
 router.get('/admin/all', protect, authorize('admin'), orderController.getAllOrders);
 
+// @desc    Advance order tracking step (Admin or Owner)
+// @route   PUT /api/orders/:id/advance-status
+// @access  Private
+router.put('/:id/advance-status', protect, orderController.advanceOrderTracking);
+
 // @desc    Cancel order
 // @route   PUT /api/orders/:id/cancel
 // @access  Private
